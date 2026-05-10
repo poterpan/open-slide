@@ -21,10 +21,13 @@ import { useFolders } from '@/lib/folders';
 import { format, useLocale } from '@/lib/use-locale';
 import { cn } from '@/lib/utils';
 import { FolderIconChip, SLIDE_DND_MIME } from '../components/sidebar/folder-item';
-import { DRAFT_ID, Sidebar } from '../components/sidebar/sidebar';
+import { DRAFT_ID, Sidebar, THEMES_ID } from '../components/sidebar/sidebar';
 import { SlideCanvas } from '../components/slide-canvas';
+import { ThemeDetail } from '../components/themes/theme-detail';
+import { ThemesGallery } from '../components/themes/themes-gallery';
 import type { Folder, FolderIcon, SlideModule } from '../lib/sdk';
 import { loadSlide, slideIds } from '../lib/slides';
+import { themes as themeRegistry } from '../lib/themes';
 
 export function Home() {
   const { manifest, loading, create, update, remove, assign, renameSlide, deleteSlide } =
@@ -39,6 +42,22 @@ export function Home() {
         const next = new URLSearchParams(prev);
         if (id === DRAFT_ID) next.delete('f');
         else next.set('f', id);
+        if (id !== THEMES_ID) next.delete('theme');
+        return next;
+      },
+      { replace: true },
+    );
+  };
+
+  const isThemes = selectedId === THEMES_ID;
+  const selectedThemeId = isThemes ? searchParams.get('theme') : null;
+  const selectThemeDetail = (themeId: string | null) => {
+    setSearchParams(
+      (prev) => {
+        const next = new URLSearchParams(prev);
+        next.set('f', THEMES_ID);
+        if (themeId) next.set('theme', themeId);
+        else next.delete('theme');
         return next;
       },
       { replace: true },
@@ -115,6 +134,7 @@ export function Home() {
         <Sidebar
           folders={manifest.folders}
           countFor={countFor}
+          themesCount={themeRegistry.length}
           selectedId={selectedId}
           onSelect={selectFolder}
           onCreate={(name, icon) => create(name, icon)}
@@ -149,6 +169,13 @@ export function Home() {
               active={selectedId === DRAFT_ID}
               onClick={() => selectFolder(DRAFT_ID)}
             />
+            <MobileFolderPill
+              icon={{ type: 'emoji', value: '🎨' }}
+              label={t.home.themes}
+              count={themeRegistry.length}
+              active={selectedId === THEMES_ID}
+              onClick={() => selectFolder(THEMES_ID)}
+            />
             {manifest.folders.map((f) => (
               <MobileFolderPill
                 key={f.id}
@@ -163,52 +190,79 @@ export function Home() {
         </div>
 
         <div className="mx-auto w-full max-w-[1180px] px-5 py-8 md:px-10 md:py-12">
-          <header className="mb-8 md:mb-12">
-            <div className="flex flex-wrap items-center gap-3">
-              <FolderIconChip icon={headerIcon} className="size-7 text-2xl" />
-              <h1 className="font-heading text-[32px] font-semibold leading-[1.05] tracking-[-0.025em] md:text-[44px]">
-                {title}
-              </h1>
-              {!loading && (
-                <span className="folio ml-1 self-end pb-2">
-                  {(isSearching ? filteredSlides.length : visibleSlides.length)
-                    .toString()
-                    .padStart(2, '0')}
-                  {isSearching && (
-                    <span className="opacity-40">
-                      /{visibleSlides.length.toString().padStart(2, '0')}
+          {isThemes ? (
+            selectedThemeId ? (
+              <ThemeDetail themeId={selectedThemeId} onBack={() => selectThemeDetail(null)} />
+            ) : (
+              <>
+                <header className="mb-8 md:mb-12">
+                  <div className="flex flex-wrap items-center gap-3">
+                    <FolderIconChip
+                      icon={{ type: 'emoji', value: '🎨' }}
+                      className="size-7 text-2xl"
+                    />
+                    <h1 className="font-heading text-[32px] font-semibold leading-[1.05] tracking-[-0.025em] md:text-[44px]">
+                      {t.themes.title}
+                    </h1>
+                    <span className="folio ml-1 self-end pb-2">
+                      {themeRegistry.length.toString().padStart(2, '0')}
+                    </span>
+                    <span className="eyebrow ml-2 self-end pb-2">{t.themes.eyebrow}</span>
+                  </div>
+                </header>
+                <ThemesGallery onOpen={(id) => selectThemeDetail(id)} />
+              </>
+            )
+          ) : (
+            <>
+              <header className="mb-8 md:mb-12">
+                <div className="flex flex-wrap items-center gap-3">
+                  <FolderIconChip icon={headerIcon} className="size-7 text-2xl" />
+                  <h1 className="font-heading text-[32px] font-semibold leading-[1.05] tracking-[-0.025em] md:text-[44px]">
+                    {title}
+                  </h1>
+                  {!loading && (
+                    <span className="folio ml-1 self-end pb-2">
+                      {(isSearching ? filteredSlides.length : visibleSlides.length)
+                        .toString()
+                        .padStart(2, '0')}
+                      {isSearching && (
+                        <span className="opacity-40">
+                          /{visibleSlides.length.toString().padStart(2, '0')}
+                        </span>
+                      )}
                     </span>
                   )}
-                </span>
-              )}
-              <div className="ml-auto w-full md:w-auto">
-                <SearchInput value={query} onChange={setQuery} />
-              </div>
-            </div>
-          </header>
+                  <div className="ml-auto w-full md:w-auto">
+                    <SearchInput value={query} onChange={setQuery} />
+                  </div>
+                </div>
+              </header>
 
-          {loading ? (
-            <HomeLoading />
-          ) : visibleSlides.length === 0 ? (
-            <EmptyState isDraft={isDraft} folderName={selectedFolder?.name} />
-          ) : filteredSlides.length === 0 ? (
-            <NoResultsState query={query} onClear={() => setQuery('')} />
-          ) : (
-            <ul className="grid grid-cols-[repeat(auto-fill,minmax(240px,1fr))] gap-x-6 gap-y-9 md:grid-cols-[repeat(auto-fill,minmax(300px,1fr))]">
-              {filteredSlides.map((id) => (
-                <li key={id}>
-                  <SlideCard
-                    id={id}
-                    folders={manifest.folders}
-                    currentFolderId={manifest.assignments[id] ?? null}
-                    onRename={(name) => renameSlide(id, name)}
-                    onMove={(folderId) => assign(id, folderId)}
-                    onDelete={() => deleteSlide(id)}
-                    onTitleResolved={reportTitle}
-                  />
-                </li>
-              ))}
-            </ul>
+              {loading ? (
+                <HomeLoading />
+              ) : visibleSlides.length === 0 ? (
+                <EmptyState isDraft={isDraft} folderName={selectedFolder?.name} />
+              ) : filteredSlides.length === 0 ? (
+                <NoResultsState query={query} onClear={() => setQuery('')} />
+              ) : (
+                <ul className="grid grid-cols-[repeat(auto-fill,minmax(240px,1fr))] gap-x-6 gap-y-9 md:grid-cols-[repeat(auto-fill,minmax(300px,1fr))]">
+                  {filteredSlides.map((id) => (
+                    <li key={id}>
+                      <SlideCard
+                        id={id}
+                        folders={manifest.folders}
+                        currentFolderId={manifest.assignments[id] ?? null}
+                        onRename={(name) => renameSlide(id, name)}
+                        onMove={(folderId) => assign(id, folderId)}
+                        onDelete={() => deleteSlide(id)}
+                        onTitleResolved={reportTitle}
+                      />
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </>
           )}
         </div>
       </div>

@@ -38,6 +38,7 @@ export const en: Locale = {
   home: {
     appTitle: 'open-slide',
     draft: 'Draft',
+    themes: 'Themes',
     folders: 'Folders',
     newFolder: 'New folder',
     folderName: 'Folder name',
@@ -337,5 +338,25 @@ export const en: Locale = {
     statusSaving: 'Saving…',
     statusSaved: 'Saved',
     statusError: 'Save failed: {msg}',
+  },
+
+  themes: {
+    title: 'Themes',
+    eyebrow: 'Visual identities',
+    modeLight: 'Light',
+    modeDark: 'Dark',
+    modeSystem: 'System',
+    noThemesTitle: 'No themes yet',
+    noThemesHintPrefix: 'Run ',
+    noThemesHintSuffix: ' to author one — a markdown file under themes/ plus a sibling demo slide.',
+    noDemoYet: 'No demo yet',
+    noDemoHintPrefix: 'Re-run ',
+    noDemoHintSuffix: ' for this theme to generate a preview slide.',
+    backToGallery: 'Back to themes',
+    pageOf: 'page {n}/{total}',
+    nextPageAria: 'Next page',
+    prevPageAria: 'Previous page',
+    markdownEyebrow: 'Theme spec',
+    openThemeAria: 'Open theme {name}',
   },
 };

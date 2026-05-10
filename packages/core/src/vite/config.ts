@@ -11,6 +11,7 @@ import { filesPlugin } from './files-plugin.ts';
 import { locTagsPlugin } from './loc-tags-plugin.ts';
 import { notesPlugin } from './notes-plugin.ts';
 import { loadUserConfig, type OpenSlideConfig, openSlidePlugin } from './open-slide-plugin.ts';
+import { themesPlugin } from './themes-plugin.ts';
 
 function findPackageRoot(fromFile: string): string {
   let dir = path.dirname(fromFile);
@@ -34,7 +35,9 @@ export async function createViteConfig(opts: CreateViteConfigOptions): Promise<I
   const userCwd = path.resolve(opts.userCwd);
   const config = opts.config ?? (await loadUserConfig(userCwd));
   const slidesDir = config.slidesDir ?? 'slides';
+  const themesDir = config.themesDir ?? 'themes';
   const slidesAbs = path.resolve(userCwd, slidesDir);
+  const themesAbs = path.resolve(userCwd, themesDir);
 
   return {
     root: APP_ROOT,
@@ -45,6 +48,7 @@ export async function createViteConfig(opts: CreateViteConfigOptions): Promise<I
       react(),
       tailwindcss(),
       openSlidePlugin({ userCwd, config }),
+      themesPlugin({ userCwd, config }),
       designPlugin({ userCwd }),
       commentsPlugin({ userCwd, slidesDir }),
       notesPlugin({ userCwd, slidesDir }),
@@ -90,7 +94,7 @@ export async function createViteConfig(opts: CreateViteConfigOptions): Promise<I
     },
     server: {
       port: config.port ?? 5173,
-      fs: { allow: [APP_ROOT, userCwd, slidesAbs] },
+      fs: { allow: [APP_ROOT, userCwd, slidesAbs, themesAbs] },
     },
     build: {
       outDir: path.resolve(userCwd, 'dist'),

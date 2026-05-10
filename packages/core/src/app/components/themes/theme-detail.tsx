@@ -1,0 +1,178 @@
+import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { useEffect, useMemo, useState } from 'react';
+import { Button } from '@/components/ui/button';
+import { format, useLocale } from '@/lib/use-locale';
+import { cn } from '@/lib/utils';
+import { loadThemeDemo, type ThemeDemoModule, themes } from '../../lib/themes';
+import { SlideCanvas } from '../slide-canvas';
+
+export function ThemeDetail({ themeId, onBack }: { themeId: string; onBack: () => void }) {
+  const t = useLocale();
+  const theme = useMemo(() => themes.find((th) => th.id === themeId), [themeId]);
+  const [demo, setDemo] = useState<ThemeDemoModule | null>(null);
+  const [pageIndex, setPageIndex] = useState(0);
+
+  useEffect(() => {
+    setPageIndex(0);
+    setDemo(null);
+    if (!theme?.hasDemo) return;
+    let cancelled = false;
+    loadThemeDemo(theme.id)
+      .then((mod) => {
+        if (!cancelled) setDemo(mod);
+      })
+      .catch(() => {});
+    return () => {
+      cancelled = true;
+    };
+  }, [theme]);
+
+  const pages = demo?.default ?? [];
+  const totalPages = pages.length;
+
+  useEffect(() => {
+    if (totalPages <= 1) return;
+    const onKey = (e: KeyboardEvent) => {
+      const tag = (e.target as HTMLElement | null)?.tagName;
+      if (tag === 'INPUT' || tag === 'TEXTAREA') return;
+      if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
+        setPageIndex((i) => Math.min(totalPages - 1, i + 1));
+      } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
+        setPageIndex((i) => Math.max(0, i - 1));
+      }
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [totalPages]);
+
+  if (!theme) {
+    return (
+      <div className="px-8 py-12">
+        <Button variant="ghost" size="sm" onClick={onBack}>
+          <ChevronLeft className="size-4" />
+          {t.themes.backToGallery}
+        </Button>
+      </div>
+    );
+  }
+
+  const Current = pages[pageIndex];
+
+  return (
+    <div className="flex flex-col gap-6 md:gap-8">
+      <div className="flex items-center gap-3">
+        <Button variant="ghost" size="sm" onClick={onBack} className="-ml-2">
+          <ChevronLeft className="size-4" />
+          {t.themes.backToGallery}
+        </Button>
+      </div>
+
+      <header className="flex flex-wrap items-baseline gap-3">
+        <h2 className="font-heading text-[26px] font-semibold leading-[1.05] tracking-[-0.025em] md:text-[32px]">
+          {theme.name}
+        </h2>
+        <ModeBadge mode={theme.mode} />
+        {theme.description ? (
+          <p className="basis-full text-[13px] leading-relaxed text-muted-foreground">
+            {theme.description}
+          </p>
+        ) : null}
+      </header>
+
+      <div className="grid gap-6 lg:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)]">
+        <div className="flex flex-col gap-3">
+          <div className="relative aspect-video overflow-hidden rounded-[8px] border border-hairline bg-card shadow-edge ring-1 ring-foreground/[0.04]">
+            {!theme.hasDemo ? (
+              <NoDemoLargeState />
+            ) : !demo ? (
+              <div className="grid h-full w-full place-items-center text-[11px] tracking-[0.16em] uppercase text-muted-foreground/60">
+                {t.common.loading}
+              </div>
+            ) : Current ? (
+              <SlideCanvas flat freezeMotion design={demo.design}>
+                <Current />
+              </SlideCanvas>
+            ) : null}
+          </div>
+
+          {totalPages > 1 ? (
+            <div className="flex items-center justify-between gap-2">
+              <button
+                type="button"
+                aria-label={t.themes.prevPageAria}
+                disabled={pageIndex === 0}
+                onClick={() => setPageIndex((i) => Math.max(0, i - 1))}
+                className="flex size-8 items-center justify-center rounded-[6px] border border-border bg-card text-foreground transition-colors hover:bg-muted disabled:opacity-40"
+              >
+                <ChevronLeft className="size-4" />
+              </button>
+              <span className="folio">
+                {format(t.themes.pageOf, { n: pageIndex + 1, total: totalPages })}
+              </span>
+              <button
+                type="button"
+                aria-label={t.themes.nextPageAria}
+                disabled={pageIndex === totalPages - 1}
+                onClick={() => setPageIndex((i) => Math.min(totalPages - 1, i + 1))}
+                className="flex size-8 items-center justify-center rounded-[6px] border border-border bg-card text-foreground transition-colors hover:bg-muted disabled:opacity-40"
+              >
+                <ChevronRight className="size-4" />
+              </button>
+            </div>
+          ) : null}
+        </div>
+
+        <div className="flex min-h-0 flex-col gap-2">
+          <span className="eyebrow">{t.themes.markdownEyebrow}</span>
+          <pre className="max-h-[640px] overflow-auto rounded-[8px] border border-hairline bg-card p-4 font-mono text-[11.5px] leading-relaxed text-foreground/90">
+            {theme.body}
+          </pre>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function ModeBadge({ mode }: { mode: 'light' | 'dark' | 'system' }) {
+  const t = useLocale();
+  const label =
+    mode === 'light'
+      ? t.themes.modeLight
+      : mode === 'dark'
+        ? t.themes.modeDark
+        : t.themes.modeSystem;
+  return (
+    <span
+      className={cn(
+        'shrink-0 rounded-[3px] px-1.5 py-0.5 text-[10px] font-medium uppercase tracking-[0.08em] ring-1',
+        mode === 'dark'
+          ? 'bg-foreground text-background ring-foreground/40'
+          : mode === 'light'
+            ? 'bg-card text-foreground ring-border'
+            : 'bg-muted text-muted-foreground ring-border',
+      )}
+    >
+      {label}
+    </span>
+  );
+}
+
+function NoDemoLargeState() {
+  const t = useLocale();
+  return (
+    <div className="grid h-full w-full place-items-center bg-muted/40 px-8 text-center">
+      <div className="max-w-sm">
+        <p className="font-heading text-[15px] font-semibold tracking-tight">
+          {t.themes.noDemoYet}
+        </p>
+        <p className="mt-1.5 text-[12.5px] leading-relaxed text-muted-foreground">
+          {t.themes.noDemoHintPrefix}
+          <code className="rounded-[4px] bg-card px-1.5 py-0.5 font-mono text-[11.5px] text-foreground">
+            /create-theme
+          </code>
+          {t.themes.noDemoHintSuffix}
+        </p>
+      </div>
+    </div>
+  );
+}

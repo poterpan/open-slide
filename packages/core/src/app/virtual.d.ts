@@ -26,3 +26,23 @@ declare module 'virtual:open-slide/folders' {
   const manifest: FoldersManifest;
   export default manifest;
 }
+
+declare module 'virtual:open-slide/themes' {
+  import type { DesignSystem } from './lib/design';
+  import type { Page } from './lib/sdk';
+
+  export type ThemeMeta = {
+    id: string;
+    name: string;
+    description: string;
+    mode: 'light' | 'dark' | 'system';
+    body: string;
+    hasDemo: boolean;
+  };
+
+  export const themes: ThemeMeta[];
+  export function loadThemeDemo(id: string): Promise<{
+    default: Page[];
+    design?: DesignSystem;
+  }>;
+}
