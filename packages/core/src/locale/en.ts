@@ -324,6 +324,12 @@ export const en: Locale = {
     nextAria: 'Next page',
   },
 
+  imagePlaceholder: {
+    dropOverlay: 'Drop image to use here',
+    uploading: 'Uploading…',
+    uploadFailed: "Couldn't upload image",
+  },
+
   notesDrawer: {
     toggle: 'Notes',
     pageLabel: 'page {n}/{total}',

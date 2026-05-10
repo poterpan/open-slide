@@ -324,6 +324,12 @@ export const zhCN: Locale = {
     nextAria: '下一页',
   },
 
+  imagePlaceholder: {
+    dropOverlay: '拖入图片以使用',
+    uploading: '上传中…',
+    uploadFailed: '图片上传失败',
+  },
+
   notesDrawer: {
     toggle: '演讲备注',
     pageLabel: '第 {n} / {total} 页',

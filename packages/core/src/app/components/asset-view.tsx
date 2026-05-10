@@ -33,6 +33,7 @@ import {
 import {
   type AssetEntry,
   fetchSvgAsFile,
+  renamedCopy,
   type SvglItem,
   searchSvgl,
   useAssets,
@@ -313,19 +314,6 @@ function hasFiles(e: React.DragEvent): boolean {
     if (types[i] === 'Files') return true;
   }
   return false;
-}
-
-function renamedCopy(file: File, taken: Set<string>): File {
-  const dot = file.name.lastIndexOf('.');
-  const stem = dot > 0 ? file.name.slice(0, dot) : file.name;
-  const ext = dot > 0 ? file.name.slice(dot) : '';
-  let i = 1;
-  let next = `${stem}-${i}${ext}`;
-  while (taken.has(next)) {
-    i += 1;
-    next = `${stem}-${i}${ext}`;
-  }
-  return new File([file], next, { type: file.type, lastModified: file.lastModified });
 }
 
 function AssetCard({

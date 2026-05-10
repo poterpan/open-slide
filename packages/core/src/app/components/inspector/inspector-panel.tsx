@@ -3,13 +3,17 @@ import {
   AlignJustify,
   AlignLeft,
   AlignRight,
+  ArrowDownToLine,
   Bold,
   Crop,
   ImageIcon,
   Italic,
+  Loader2,
+  Upload,
   X,
 } from 'lucide-react';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useId, useRef, useState } from 'react';
+import { toast } from 'sonner';
 import { Field, NumberField, Section } from '@/components/panel/panel-fields';
 import { PANEL_TRANSITION_MS, PanelShell, useAnimatedOpen } from '@/components/panel/panel-shell';
 import { Button } from '@/components/ui/button';
@@ -34,10 +38,10 @@ import { Textarea } from '@/components/ui/textarea';
 import { Toggle } from '@/components/ui/toggle';
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
-import { type AssetEntry, useAssets } from '@/lib/assets';
+import { type AssetEntry, uploadWithAutoRename, useAssets } from '@/lib/assets';
 import { findSlideSource } from '@/lib/inspector/fiber';
 import type { EditOp } from '@/lib/inspector/use-editor';
-import { useLocale } from '@/lib/use-locale';
+import { format, useLocale } from '@/lib/use-locale';
 import { cn } from '@/lib/utils';
 import type { Locale } from '../../../locale/types';
 import { type SelectedTarget, useInspector } from './inspector-provider';
@@ -746,11 +750,35 @@ function AssetPickerDialog({
   onClose: () => void;
   onPick: (asset: AssetEntry) => void;
 }) {
-  const { assets, loading } = useAssets(slideId);
+  const { assets, loading, refresh } = useAssets(slideId);
   const images = assets.filter((a) => a.mime.startsWith('image/'));
   const t = useLocale();
   const path = `slides/${slideId}/assets/`;
   const [descPrefix, descSuffix] = t.inspector.replaceImageDescription.split('{path}');
+  const [uploading, setUploading] = useState(false);
+  const [dragActive, setDragActive] = useState(false);
+  const dragDepth = useRef(0);
+  const inputId = useId();
+
+  const handleFile = useCallback(
+    async (file: File) => {
+      if (!file.type.startsWith('image/')) return;
+      setUploading(true);
+      try {
+        const { ok, status, entry } = await uploadWithAutoRename(slideId, file);
+        if (!ok || !entry) {
+          toast.error(format(t.asset.toastUploadFailed, { status }));
+          return;
+        }
+        await refresh().catch(() => {});
+        onPick(entry);
+      } finally {
+        setUploading(false);
+      }
+    },
+    [slideId, refresh, onPick, t],
+  );
+
   return (
     <Dialog open onOpenChange={(o) => !o && onClose()}>
       <DialogContent className="sm:max-w-xl">
@@ -762,7 +790,60 @@ function AssetPickerDialog({
             {descSuffix}
           </DialogDescription>
         </DialogHeader>
-        <div className="max-h-[60vh] overflow-y-auto">
+        <label
+          htmlFor={inputId}
+          className={cn(
+            'absolute right-12 top-3.5 inline-flex h-7 cursor-pointer items-center gap-1.5 rounded-[5px] border border-border bg-card px-2 text-[12px] font-medium transition-colors',
+            'hover:bg-muted/60 hover:border-foreground/20 active:translate-y-px',
+            uploading && 'pointer-events-none opacity-60',
+          )}
+        >
+          {uploading ? (
+            <Loader2 className="size-3.5 animate-spin" />
+          ) : (
+            <Upload className="size-3.5" />
+          )}
+          <span>{t.asset.upload}</span>
+        </label>
+        <input
+          id={inputId}
+          type="file"
+          accept="image/*"
+          className="sr-only"
+          disabled={uploading}
+          onChange={(e) => {
+            const file = e.target.files?.[0];
+            e.target.value = '';
+            if (file) handleFile(file).catch(() => {});
+          }}
+        />
+        <section
+          aria-label={t.inspector.replaceImageDialogTitle}
+          className="relative max-h-[60vh] overflow-y-auto"
+          onDragEnter={(e) => {
+            if (uploading || !hasFiles(e)) return;
+            e.preventDefault();
+            dragDepth.current += 1;
+            setDragActive(true);
+          }}
+          onDragOver={(e) => {
+            if (uploading || !hasFiles(e)) return;
+            e.preventDefault();
+            e.dataTransfer.dropEffect = 'copy';
+          }}
+          onDragLeave={() => {
+            dragDepth.current = Math.max(0, dragDepth.current - 1);
+            if (dragDepth.current === 0) setDragActive(false);
+          }}
+          onDrop={(e) => {
+            if (uploading || !hasFiles(e)) return;
+            e.preventDefault();
+            dragDepth.current = 0;
+            setDragActive(false);
+            const file = e.dataTransfer.files?.[0];
+            if (file) handleFile(file).catch(() => {});
+          }}
+        >
           {loading ? (
             <p className="px-1 py-6 text-center text-xs text-muted-foreground">
               {t.inspector.pickerLoading}
@@ -800,10 +881,34 @@ function AssetPickerDialog({
               ))}
             </div>
           )}
-        </div>
+          {dragActive && (
+            <div
+              className="pointer-events-none absolute inset-0 z-10 animate-in fade-in-0 duration-200"
+              aria-hidden
+            >
+              <div className="absolute inset-0 bg-brand/5" />
+              <div className="absolute inset-1 rounded-[8px] border border-dashed border-brand/40" />
+              <div className="absolute inset-x-0 bottom-4 flex justify-center">
+                <div className="flex items-center gap-2 rounded-[6px] border border-border bg-card px-3 py-1.5 text-[12px] font-medium shadow-floating">
+                  <ArrowDownToLine className="size-3.5 text-brand" />
+                  <span>{t.asset.dropToUpload}</span>
+                </div>
+              </div>
+            </div>
+          )}
+        </section>
       </DialogContent>
     </Dialog>
   );
+}
+
+function hasFiles(e: React.DragEvent): boolean {
+  const types = e.dataTransfer?.types;
+  if (!types) return false;
+  for (let i = 0; i < types.length; i++) {
+    if (types[i] === 'Files') return true;
+  }
+  return false;
 }
 
 function AgentWatchingBadge() {

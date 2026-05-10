@@ -10,14 +10,14 @@ export type AssetEntry = {
 
 export type UploadOptions = { overwrite?: boolean };
 
-async function listAssets(slideId: string): Promise<AssetEntry[]> {
+export async function listAssets(slideId: string): Promise<AssetEntry[]> {
   const res = await fetch(`/__assets/${slideId}`);
   if (!res.ok) throw new Error(`GET /__assets/${slideId} ${res.status}`);
   const data = (await res.json()) as { assets?: AssetEntry[] };
   return data.assets ?? [];
 }
 
-async function uploadAsset(
+export async function uploadAsset(
   slideId: string,
   file: File,
   opts: UploadOptions = {},
@@ -43,6 +43,43 @@ async function renameAsset(slideId: string, from: string, to: string): Promise<R
 
 async function deleteAsset(slideId: string, name: string): Promise<Response> {
   return fetch(`/__assets/${slideId}/${encodeURIComponent(name)}`, { method: 'DELETE' });
+}
+
+export async function uploadWithAutoRename(
+  slideId: string,
+  file: File,
+): Promise<{ ok: boolean; status: number; entry: AssetEntry | null }> {
+  let res = await uploadAsset(slideId, file);
+  let uploaded = file;
+  if (res.status === 409) {
+    const list = await listAssets(slideId);
+    const taken = new Set(list.map((a) => a.name));
+    uploaded = renamedCopy(file, taken);
+    res = await uploadAsset(slideId, uploaded);
+  }
+  if (!res.ok) return { ok: false, status: res.status, entry: null };
+  const body = (await res.json().catch(() => null)) as Partial<AssetEntry> | null;
+  const entry: AssetEntry = {
+    name: body?.name ?? uploaded.name,
+    size: body?.size ?? uploaded.size,
+    mtime: body?.mtime ?? Date.now(),
+    mime: body?.mime ?? uploaded.type ?? 'application/octet-stream',
+    url: body?.url ?? `/__assets/${slideId}/${encodeURIComponent(uploaded.name)}`,
+  };
+  return { ok: true, status: res.status, entry };
+}
+
+export function renamedCopy(file: File, taken: Set<string>): File {
+  const dot = file.name.lastIndexOf('.');
+  const stem = dot > 0 ? file.name.slice(0, dot) : file.name;
+  const ext = dot > 0 ? file.name.slice(dot) : '';
+  let i = 1;
+  let next = `${stem}-${i}${ext}`;
+  while (taken.has(next)) {
+    i += 1;
+    next = `${stem}-${i}${ext}`;
+  }
+  return new File([file], next, { type: file.type, lastModified: file.lastModified });
 }
 
 export type SvglItem = {

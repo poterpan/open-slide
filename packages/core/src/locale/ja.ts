@@ -328,6 +328,12 @@ export const ja: Locale = {
     nextAria: '次のページ',
   },
 
+  imagePlaceholder: {
+    dropOverlay: 'ここにドロップして使用',
+    uploading: 'アップロード中…',
+    uploadFailed: '画像のアップロードに失敗しました',
+  },
+
   notesDrawer: {
     toggle: '発表者ノート',
     pageLabel: '{n} / {total} ページ',

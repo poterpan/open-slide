@@ -324,6 +324,12 @@ export const zhTW: Locale = {
     nextAria: '下一頁',
   },
 
+  imagePlaceholder: {
+    dropOverlay: '拖入圖片以使用',
+    uploading: '上傳中…',
+    uploadFailed: '圖片上傳失敗',
+  },
+
   notesDrawer: {
     toggle: '講稿',
     pageLabel: '第 {n} / {total} 頁',

@@ -345,6 +345,12 @@ export type Locale = {
     nextAria: string;
   };
 
+  imagePlaceholder: {
+    dropOverlay: string;
+    uploading: string;
+    uploadFailed: string;
+  };
+
   notesDrawer: {
     toggle: string;
     /** template: "page {n}/{total}" */
