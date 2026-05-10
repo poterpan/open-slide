@@ -1,5 +1,5 @@
 import { ChevronLeft, ChevronRight } from 'lucide-react';
-import { useEffect, useMemo, useState } from 'react';
+import { Fragment, type ReactNode, useEffect, useMemo, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { format, useLocale } from '@/lib/use-locale';
 import { loadThemeDemo, type ThemeDemoModule, themes } from '../../lib/themes';
@@ -123,12 +123,43 @@ export function ThemeDetail({ themeId, onBack }: { themeId: string; onBack: () =
         <div className="flex min-h-0 flex-col gap-2">
           <span className="eyebrow">{t.themes.markdownEyebrow}</span>
           <pre className="max-h-[640px] overflow-auto rounded-[8px] border border-hairline bg-card p-4 font-mono text-[11.5px] leading-relaxed text-foreground/90">
-            {theme.body}
+            {renderBodyWithSwatches(theme.body)}
           </pre>
         </div>
       </div>
     </div>
   );
+}
+
+const HEX_RE = /#(?:[0-9a-fA-F]{8}|[0-9a-fA-F]{6}|[0-9a-fA-F]{4}|[0-9a-fA-F]{3})\b/g;
+
+function renderBodyWithSwatches(body: string): ReactNode[] {
+  const out: ReactNode[] = [];
+  let lastIndex = 0;
+  let match: RegExpExecArray | null = HEX_RE.exec(body);
+  let key = 0;
+  while (match !== null) {
+    if (match.index > lastIndex) {
+      out.push(<Fragment key={`t${key}`}>{body.slice(lastIndex, match.index)}</Fragment>);
+    }
+    const hex = match[0];
+    out.push(
+      <span
+        key={`s${key}`}
+        aria-hidden
+        className="mr-[0.25em] inline-block size-[0.85em] translate-y-[0.05em] rounded-[2px] align-middle ring-1 ring-foreground/15"
+        style={{ background: hex }}
+      />,
+    );
+    out.push(<Fragment key={`h${key}`}>{hex}</Fragment>);
+    lastIndex = match.index + hex.length;
+    key += 1;
+    match = HEX_RE.exec(body);
+  }
+  if (lastIndex < body.length) {
+    out.push(<Fragment key={`t${key}`}>{body.slice(lastIndex)}</Fragment>);
+  }
+  return out;
 }
 
 function NoDemoLargeState() {
