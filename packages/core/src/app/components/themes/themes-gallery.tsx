@@ -11,7 +11,7 @@ export function ThemesGallery({ onOpen }: { onOpen: (id: string) => void }) {
   }
 
   return (
-    <ul className="grid grid-cols-[repeat(auto-fill,minmax(280px,1fr))] gap-x-6 gap-y-9 md:grid-cols-[repeat(auto-fill,minmax(340px,1fr))]">
+    <ul className="grid grid-cols-[repeat(auto-fill,minmax(min(240px,100%),1fr))] gap-x-6 gap-y-9 md:grid-cols-[repeat(auto-fill,minmax(340px,1fr))]">
       {themes.map((theme) => (
         <li key={theme.id}>
           <ThemeCard

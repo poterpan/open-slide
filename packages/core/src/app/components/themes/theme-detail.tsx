@@ -78,7 +78,7 @@ export function ThemeDetail({ themeId, onBack }: { themeId: string; onBack: () =
       </header>
 
       <div className="grid gap-6 lg:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)]">
-        <div className="flex flex-col gap-3">
+        <div className="flex min-w-0 flex-col gap-3">
           <div className="relative aspect-video overflow-hidden rounded-[8px] border border-hairline bg-card shadow-edge ring-1 ring-foreground/[0.04]">
             {!theme.hasDemo ? (
               <NoDemoLargeState />
@@ -120,9 +120,9 @@ export function ThemeDetail({ themeId, onBack }: { themeId: string; onBack: () =
           ) : null}
         </div>
 
-        <div className="flex min-h-0 flex-col gap-2">
+        <div className="flex min-h-0 min-w-0 flex-col gap-2">
           <span className="eyebrow">{t.themes.markdownEyebrow}</span>
-          <pre className="max-h-[640px] overflow-auto rounded-[8px] border border-hairline bg-card p-4 font-mono text-[11.5px] leading-relaxed text-foreground/90">
+          <pre className="max-h-[640px] w-full overflow-auto rounded-[8px] border border-hairline bg-card p-4 font-mono text-[11.5px] leading-relaxed text-foreground/90">
             {renderBodyWithSwatches(theme.body)}
           </pre>
         </div>
