@@ -99,11 +99,58 @@ function FeatureCell({
   );
 }
 
+const AGENT_LOOP_DURATION = 9;
+const COMMENT_TEXT = 'use the accent color on this title';
+
 function AgentApplyVisual() {
   const ref = useRef<HTMLDivElement>(null);
   const inView = useInView(ref, { amount: 0.3 });
   const reduced = useReducedMotion();
   const active = inView && !reduced;
+
+  const typingProgress = useMotionValue(1);
+  const bubblePhase = useMotionValue(1);
+  const commentText = useTransform(typingProgress, (p) =>
+    COMMENT_TEXT.slice(0, Math.max(0, Math.round(p * COMMENT_TEXT.length))),
+  );
+  const bubbleLabel = useTransform(bubblePhase, (v): string => (v > 0.5 ? '1' : '0'));
+
+  useEffect(() => {
+    if (!active) {
+      typingProgress.set(1);
+      bubblePhase.set(1);
+      return;
+    }
+    typingProgress.set(0);
+    bubblePhase.set(0);
+
+    const typingControls = animate(typingProgress, [0, 0, 1, 1, 0, 0], {
+      duration: AGENT_LOOP_DURATION,
+      times: [0, 0.3, 0.5, 0.87, 0.92, 1],
+      ease: 'linear',
+      repeat: Infinity,
+    });
+    const bubbleControls = animate(bubblePhase, [0, 0, 1, 1, 0, 0], {
+      duration: AGENT_LOOP_DURATION,
+      times: [0, 0.5, 0.51, 0.87, 0.88, 1],
+      ease: 'linear',
+      repeat: Infinity,
+    });
+    return () => {
+      typingControls.stop();
+      bubbleControls.stop();
+    };
+  }, [active, typingProgress, bubblePhase]);
+
+  const loopTransition = (times: number[]) =>
+    active
+      ? {
+          duration: AGENT_LOOP_DURATION,
+          times,
+          ease: 'easeInOut' as const,
+          repeat: Infinity,
+        }
+      : undefined;
 
   return (
     <div
@@ -123,10 +170,15 @@ function AgentApplyVisual() {
             <motion.span
               aria-hidden
               className="absolute -inset-[0.6cqw] border-2 border-[#3b82f6] bg-[#3b82f6]/10 pointer-events-none"
-              animate={active ? { opacity: [1, 0.55, 1] } : { opacity: 1 }}
-              transition={
-                active ? { duration: 2.4, repeat: Infinity, ease: 'easeInOut' } : undefined
+              animate={
+                active
+                  ? {
+                      opacity: [0, 0, 1, 1, 0, 0],
+                      scale: [0.92, 0.92, 1, 1, 0.96, 0.96],
+                    }
+                  : { opacity: 1, scale: 1 }
               }
+              transition={loopTransition([0, 0.06, 0.13, 0.82, 0.9, 1])}
             />
             <motion.span
               className="relative font-[family-name:var(--font-sans)] font-semibold tracking-[-0.035em] leading-[1.0]"
@@ -140,20 +192,12 @@ function AgentApplyVisual() {
                         'var(--color-accent)',
                         'var(--color-accent)',
                         'var(--color-text)',
+                        'var(--color-text)',
                       ],
                     }
                   : { color: 'var(--color-text)' }
               }
-              transition={
-                active
-                  ? {
-                      duration: 6,
-                      times: [0, 0.32, 0.42, 0.82, 0.92],
-                      ease: 'easeInOut',
-                      repeat: Infinity,
-                    }
-                  : undefined
-              }
+              transition={loopTransition([0, 0.55, 0.62, 0.83, 0.9, 1])}
             >
               Q2 Launch
             </motion.span>
@@ -172,9 +216,18 @@ function AgentApplyVisual() {
           style={{ width: '38%' }}
         >
           {/* popup */}
-          <div
-            className="w-full rounded-[6px] border border-[color:var(--color-rule)] bg-[color:var(--color-panel-hi)] shadow-[0_8px_24px_-12px_rgba(0,0,0,0.35)] overflow-hidden font-[family-name:var(--font-sans)]"
+          <motion.div
+            className="w-full origin-bottom rounded-[6px] border border-[color:var(--color-rule)] bg-[color:var(--color-panel-hi)] shadow-[0_8px_24px_-12px_rgba(0,0,0,0.35)] overflow-hidden font-[family-name:var(--font-sans)]"
             style={{ fontSize: '1.2cqw' }}
+            animate={
+              active
+                ? {
+                    opacity: [0, 0, 1, 1, 0, 0],
+                    y: ['12%', '12%', '0%', '0%', '12%', '12%'],
+                  }
+                : { opacity: 1, y: '0%' }
+            }
+            transition={loopTransition([0, 0.14, 0.24, 0.82, 0.9, 1])}
           >
             <div
               className="flex items-center justify-between border-b border-[color:var(--color-rule)]"
@@ -201,9 +254,20 @@ function AgentApplyVisual() {
                 </div>
                 <div
                   className="text-[color:var(--color-text)]"
-                  style={{ fontSize: '1.2cqw', marginTop: '0.2cqw' }}
+                  style={{ fontSize: '1.2cqw', marginTop: '0.2cqw', minHeight: '1.7cqw' }}
                 >
-                  use the accent color on this title
+                  <motion.span>{commentText}</motion.span>
+                  <motion.span
+                    aria-hidden
+                    className="inline-block align-[-0.15em] bg-[color:var(--color-text)]"
+                    style={{
+                      width: '0.12cqw',
+                      height: '1.4cqw',
+                      marginLeft: '0.15cqw',
+                    }}
+                    animate={active ? { opacity: [0, 0, 1, 1, 0, 0, 0] } : { opacity: 0 }}
+                    transition={loopTransition([0, 0.28, 0.3, 0.5, 0.52, 0.9, 1])}
+                  />
                 </div>
               </div>
               <span className="text-[color:var(--color-dim)]">⌫</span>
@@ -229,22 +293,13 @@ function AgentApplyVisual() {
                       }
                     : { backgroundColor: 'var(--color-panel)' }
                 }
-                transition={
-                  active
-                    ? {
-                        duration: 6,
-                        times: [0, 0.22, 0.3, 0.42, 1],
-                        ease: 'easeInOut',
-                        repeat: Infinity,
-                      }
-                    : undefined
-                }
+                transition={loopTransition([0, 0.5, 0.55, 0.61, 1])}
               >
                 /apply-comments
               </motion.span>{' '}
               in your agent to apply these.
             </div>
-          </div>
+          </motion.div>
 
           {/* bubble button */}
           <span
@@ -252,7 +307,7 @@ function AgentApplyVisual() {
             style={{ padding: '0.7cqw 1.1cqw', fontSize: '1.15cqw' }}
           >
             <CommentGlyph />
-            <span>1</span>
+            <motion.span>{bubbleLabel}</motion.span>
           </span>
         </div>
       </div>
