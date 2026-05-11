@@ -5,7 +5,7 @@ import chalk from 'chalk';
 import { Command } from 'commander';
 import prompts from 'prompts';
 import { type InitOptions, init, isDirNonEmpty, LOCALE_CHOICES, type LocaleCode } from './init.ts';
-import { detectPackageManager, type PackageManager } from './package-manager.ts';
+import { detectPackageManager, PACKAGE_MANAGERS, type PackageManager } from './package-manager.ts';
 
 async function readVersion(): Promise<string> {
   const here = dirname(fileURLToPath(import.meta.url));
@@ -42,7 +42,7 @@ function onCancel(): never {
   process.exit(130);
 }
 
-function resolvePackageManager(flags: InitCliFlags): PackageManager {
+function packageManagerFromFlags(flags: InitCliFlags): PackageManager | undefined {
   const picks: PackageManager[] = [];
   if (flags.useNpm) picks.push('npm');
   if (flags.usePnpm) picks.push('pnpm');
@@ -54,7 +54,7 @@ function resolvePackageManager(flags: InitCliFlags): PackageManager {
       `Only one of --use-npm / --use-pnpm / --use-yarn / --use-bun may be specified (got ${picks.map((p) => `--use-${p}`).join(', ')}).`,
     );
   }
-  return picks[0] ?? detectPackageManager();
+  return picks[0];
 }
 
 async function runInit(dirArg: string | undefined, flags: InitCliFlags): Promise<void> {
@@ -64,6 +64,7 @@ async function runInit(dirArg: string | undefined, flags: InitCliFlags): Promise
   const name = flags.name;
   let force = flags.force ?? false;
   let locale: LocaleCode | undefined = parseLocale(flags.locale);
+  let packageManager = packageManagerFromFlags(flags);
 
   if (isTTY && dir === undefined) {
     const answers = await prompts(
@@ -90,6 +91,21 @@ async function runInit(dirArg: string | undefined, flags: InitCliFlags): Promise
       { onCancel },
     );
     locale = answers.locale as LocaleCode | undefined;
+  }
+
+  if (isTTY && packageManager === undefined && flags.install !== false) {
+    const detected = detectPackageManager();
+    const answers = await prompts(
+      {
+        type: 'select',
+        name: 'packageManager',
+        message: 'Package manager',
+        choices: PACKAGE_MANAGERS.map((pm) => ({ title: pm, value: pm })),
+        initial: PACKAGE_MANAGERS.indexOf(detected),
+      },
+      { onCancel },
+    );
+    packageManager = answers.packageManager as PackageManager | undefined;
   }
 
   const resolvedDir = dir ?? '.';
@@ -119,7 +135,7 @@ async function runInit(dirArg: string | undefined, flags: InitCliFlags): Promise
     dir: resolvedDir,
     force,
     name,
-    packageManager: resolvePackageManager(flags),
+    packageManager: packageManager ?? detectPackageManager(),
     install: flags.install !== false,
     git: flags.git !== false,
     locale: locale ?? 'en',
