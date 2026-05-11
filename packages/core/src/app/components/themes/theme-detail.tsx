@@ -81,77 +81,77 @@ export function ThemeDetail({ themeId, onBack }: { themeId: string; onBack: () =
         ) : null}
       </header>
 
-      <div className="grid gap-6 lg:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)]">
-        <div className="flex min-w-0 flex-col gap-3">
-          <div className="relative aspect-video overflow-hidden rounded-[8px] border border-hairline bg-card shadow-edge ring-1 ring-foreground/[0.04]">
-            {!theme.hasDemo ? (
-              <NoDemoLargeState />
-            ) : !demo ? (
-              <div className="grid h-full w-full place-items-center text-[11px] tracking-[0.16em] uppercase text-muted-foreground/60">
-                {t.common.loading}
+      <div className="grid gap-6 lg:grid-cols-[minmax(0,2fr)_minmax(0,1fr)] lg:gap-8">
+        <div className="flex min-w-0 flex-col gap-6">
+          <div className="flex flex-col gap-3">
+            <div className="relative aspect-video overflow-hidden rounded-[8px] border border-hairline bg-card shadow-edge ring-1 ring-foreground/[0.04]">
+              {!theme.hasDemo ? (
+                <NoDemoLargeState />
+              ) : !demo ? (
+                <div className="grid h-full w-full place-items-center text-[11px] tracking-[0.16em] uppercase text-muted-foreground/60">
+                  {t.common.loading}
+                </div>
+              ) : Current ? (
+                <SlideCanvas flat freezeMotion design={demo.design}>
+                  <Current />
+                </SlideCanvas>
+              ) : null}
+            </div>
+
+            {totalPages > 1 ? (
+              <div className="flex items-center justify-between gap-2">
+                <button
+                  type="button"
+                  aria-label={t.themes.prevPageAria}
+                  disabled={pageIndex === 0}
+                  onClick={() => setPageIndex((i) => Math.max(0, i - 1))}
+                  className="flex size-8 items-center justify-center rounded-[6px] border border-border bg-card text-foreground transition-colors hover:bg-muted disabled:opacity-40"
+                >
+                  <ChevronLeft className="size-4" />
+                </button>
+                <span className="folio">
+                  {format(t.themes.pageOf, { n: pageIndex + 1, total: totalPages })}
+                </span>
+                <button
+                  type="button"
+                  aria-label={t.themes.nextPageAria}
+                  disabled={pageIndex === totalPages - 1}
+                  onClick={() => setPageIndex((i) => Math.min(totalPages - 1, i + 1))}
+                  className="flex size-8 items-center justify-center rounded-[6px] border border-border bg-card text-foreground transition-colors hover:bg-muted disabled:opacity-40"
+                >
+                  <ChevronRight className="size-4" />
+                </button>
               </div>
-            ) : Current ? (
-              <SlideCanvas flat freezeMotion design={demo.design}>
-                <Current />
-              </SlideCanvas>
             ) : null}
           </div>
 
-          {totalPages > 1 ? (
-            <div className="flex items-center justify-between gap-2">
-              <button
-                type="button"
-                aria-label={t.themes.prevPageAria}
-                disabled={pageIndex === 0}
-                onClick={() => setPageIndex((i) => Math.max(0, i - 1))}
-                className="flex size-8 items-center justify-center rounded-[6px] border border-border bg-card text-foreground transition-colors hover:bg-muted disabled:opacity-40"
-              >
-                <ChevronLeft className="size-4" />
-              </button>
-              <span className="folio">
-                {format(t.themes.pageOf, { n: pageIndex + 1, total: totalPages })}
-              </span>
-              <button
-                type="button"
-                aria-label={t.themes.nextPageAria}
-                disabled={pageIndex === totalPages - 1}
-                onClick={() => setPageIndex((i) => Math.min(totalPages - 1, i + 1))}
-                className="flex size-8 items-center justify-center rounded-[6px] border border-border bg-card text-foreground transition-colors hover:bg-muted disabled:opacity-40"
-              >
-                <ChevronRight className="size-4" />
-              </button>
-            </div>
-          ) : null}
-        </div>
-
-        <div className="flex min-h-0 min-w-0 flex-col gap-2">
-          <pre className="max-h-[640px] w-full overflow-auto rounded-[8px] border border-hairline bg-card p-4 font-mono text-[11.5px] leading-relaxed text-foreground/90">
+          <pre className="w-full overflow-auto rounded-[8px] border border-hairline bg-card p-4 font-mono text-[11.5px] leading-relaxed text-foreground/90">
             {renderBodyWithSwatches(theme.body)}
           </pre>
         </div>
-      </div>
 
-      <section className="mt-2 flex flex-col gap-5 border-t border-hairline pt-8 md:mt-4 md:pt-10">
-        <div className="flex flex-wrap items-baseline gap-3">
-          <span className="eyebrow">{t.themes.usedBy}</span>
-          {usedBySlideIds.length > 0 ? (
-            <span className="folio">{usedBySlideIds.length.toString().padStart(2, '0')}</span>
-          ) : null}
-        </div>
-        {usedBySlideIds.length === 0 ? (
-          <p className="text-[12.5px] leading-relaxed text-muted-foreground">
-            {t.themes.usedByEmpty}
-          </p>
-        ) : (
-          <ul className="grid grid-cols-[repeat(auto-fill,minmax(200px,1fr))] gap-x-5 gap-y-7 md:grid-cols-[repeat(auto-fill,minmax(220px,1fr))]">
-            {usedBySlideIds.map((id) => (
-              <li key={id}>
-                <ThemeSlideCard id={id} />
-              </li>
-            ))}
-          </ul>
-        )}
-      </section>
+        <aside className="flex min-w-0 flex-col gap-4">
+          <div className="flex flex-wrap items-baseline gap-3">
+            <span className="eyebrow">{t.themes.usedBy}</span>
+            {usedBySlideIds.length > 0 ? (
+              <span className="folio">{usedBySlideIds.length.toString().padStart(2, '0')}</span>
+            ) : null}
+          </div>
+          {usedBySlideIds.length === 0 ? (
+            <p className="text-[12.5px] leading-relaxed text-muted-foreground">
+              {t.themes.usedByEmpty}
+            </p>
+          ) : (
+            <ul className="flex flex-col gap-5">
+              {usedBySlideIds.map((id) => (
+                <li key={id}>
+                  <ThemeSlideCard id={id} />
+                </li>
+              ))}
+            </ul>
+          )}
+        </aside>
+      </div>
     </div>
   );
 }
