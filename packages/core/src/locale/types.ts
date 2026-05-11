@@ -88,6 +88,8 @@ export type Locale = {
     backToHome: string;
     agentConnected: string;
     agentConnectedTooltip: string;
+    agentDisconnected: string;
+    agentDisconnectedTooltip: string;
     download: string;
     exportAsHtml: string;
     exportAsPdf: string;

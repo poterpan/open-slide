@@ -84,6 +84,9 @@ export const zhCN: Locale = {
     agentConnected: 'Agent 已连接',
     agentConnectedTooltip:
       'Dev server 正在把你目前在哪张 slide、Inspector 选了哪个元素发布给 agent。直接到聊天说"这张 slide"或"这个元素"就行。Production build 不会出现。',
+    agentDisconnected: 'Agent 已断开',
+    agentDisconnectedTooltip:
+      '已和 dev server 断开连接，agent 没办法再看到你目前的 slide 或 Inspector 选择。请重新启动 dev server 来恢复连接。',
     home: '首页',
     backToHome: '返回首页',
     download: '下载',
