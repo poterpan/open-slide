@@ -2,7 +2,7 @@ import { existsSync } from 'node:fs';
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import fg from 'fast-glob';
-import type { Plugin } from 'vite';
+import { normalizePath, type Plugin } from 'vite';
 import type { OpenSlideConfig } from '../config.ts';
 
 export type ThemesPluginOptions = {
@@ -94,7 +94,7 @@ function generateThemesModule(themes: ParsedTheme[], isDev: boolean): string {
     .flatMap((t) => {
       const abs = t.demoAbs;
       if (!abs) return [];
-      const importPath = isDev ? `/@fs/${abs.replace(/^\/+/, '')}` : abs;
+      const importPath = isDev ? `/@fs/${normalizePath(abs).replace(/^\/+/, '')}` : abs;
       return [`    case ${JSON.stringify(t.id)}: return import(${JSON.stringify(importPath)});`];
     })
     .join('\n');
