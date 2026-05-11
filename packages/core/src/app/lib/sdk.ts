@@ -5,13 +5,13 @@ export type Page = ComponentType;
 
 export type SlideMeta = {
   title?: string;
+  theme?: string;
 };
 
 export type SlideModule = {
   default: Page[];
   meta?: SlideMeta;
   design?: DesignSystem;
-  theme?: string;
   // Index-aligned with `default`.
   notes?: (string | undefined)[];
 };

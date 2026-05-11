@@ -62,13 +62,38 @@ function toId(absFile: string, slidesRoot: string): string {
   return rel.split(path.sep)[0];
 }
 
-const THEME_RE = /^\s*export\s+const\s+theme\s*=\s*['"]([^'"]+)['"]/m;
+const META_THEME_RE = /(?:^|[\s,{])theme\s*:\s*['"]([^'"]+)['"]/;
+
+function extractMetaTheme(src: string): string | null {
+  const metaStart = src.search(/export\s+const\s+meta\b/);
+  if (metaStart === -1) return null;
+  const eqIdx = src.indexOf('=', metaStart);
+  if (eqIdx === -1) return null;
+  const openBrace = src.indexOf('{', eqIdx);
+  if (openBrace === -1) return null;
+  let depth = 0;
+  let closeBrace = -1;
+  for (let i = openBrace; i < src.length; i++) {
+    const ch = src[i];
+    if (ch === '{') depth++;
+    else if (ch === '}') {
+      depth--;
+      if (depth === 0) {
+        closeBrace = i;
+        break;
+      }
+    }
+  }
+  if (closeBrace === -1) return null;
+  const body = src.slice(openBrace + 1, closeBrace);
+  const m = body.match(META_THEME_RE);
+  return m ? m[1] : null;
+}
 
 async function readSlideTheme(abs: string): Promise<string | null> {
   try {
     const src = await fs.readFile(abs, 'utf8');
-    const m = src.match(THEME_RE);
-    return m ? m[1] : null;
+    return extractMetaTheme(src);
   } catch {
     return null;
   }

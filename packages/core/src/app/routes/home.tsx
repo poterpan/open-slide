@@ -363,13 +363,13 @@ function SlideCard({
               {displayTitle}
             </h3>
           </Link>
-          {slide?.theme && (
+          {slide?.meta?.theme && (
             <Link
-              to={`/themes/${encodeURIComponent(slide.theme)}`}
+              to={`/themes/${encodeURIComponent(slide.meta.theme)}`}
               className="inline-flex shrink-0 items-center gap-1 text-[11px] text-muted-foreground hover:text-foreground"
             >
               <Palette className="size-3" aria-hidden />
-              <span className="max-w-[120px] truncate">{slide.theme}</span>
+              <span className="max-w-[120px] truncate">{slide.meta.theme}</span>
             </Link>
           )}
         </div>
