@@ -1,4 +1,14 @@
-import type { ReactNode } from 'react';
+'use client';
+
+import {
+  animate,
+  motion,
+  useInView,
+  useMotionValue,
+  useReducedMotion,
+  useTransform,
+} from 'motion/react';
+import { type ReactNode, useEffect, useRef } from 'react';
 
 export function Inspector() {
   return (
@@ -90,8 +100,16 @@ function FeatureCell({
 }
 
 function AgentApplyVisual() {
+  const ref = useRef<HTMLDivElement>(null);
+  const inView = useInView(ref, { amount: 0.3 });
+  const reduced = useReducedMotion();
+  const active = inView && !reduced;
+
   return (
-    <div className="relative rounded-[6px] border border-[color:var(--color-rule)] bg-[color:var(--color-panel)] overflow-hidden">
+    <div
+      ref={ref}
+      className="relative rounded-[6px] border border-[color:var(--color-rule)] bg-[color:var(--color-panel)] overflow-hidden"
+    >
       <div
         className="relative aspect-[16/9] overflow-hidden"
         style={{ containerType: 'inline-size' }}
@@ -102,16 +120,43 @@ function AgentApplyVisual() {
             cover
           </span>
           <div className="relative inline-flex w-fit">
-            <span
+            <motion.span
               aria-hidden
               className="absolute -inset-[0.6cqw] border-2 border-[#3b82f6] bg-[#3b82f6]/10 pointer-events-none"
+              animate={active ? { opacity: [1, 0.55, 1] } : { opacity: 1 }}
+              transition={
+                active ? { duration: 2.4, repeat: Infinity, ease: 'easeInOut' } : undefined
+              }
             />
-            <span
+            <motion.span
               className="relative font-[family-name:var(--font-sans)] font-semibold tracking-[-0.035em] leading-[1.0]"
               style={{ fontSize: '7.6cqw' }}
+              animate={
+                active
+                  ? {
+                      color: [
+                        'var(--color-text)',
+                        'var(--color-text)',
+                        'var(--color-accent)',
+                        'var(--color-accent)',
+                        'var(--color-text)',
+                      ],
+                    }
+                  : { color: 'var(--color-text)' }
+              }
+              transition={
+                active
+                  ? {
+                      duration: 6,
+                      times: [0, 0.32, 0.42, 0.82, 0.92],
+                      ease: 'easeInOut',
+                      repeat: Infinity,
+                    }
+                  : undefined
+              }
             >
               Q2 Launch
-            </span>
+            </motion.span>
           </div>
           <span
             className="font-[family-name:var(--font-sans)] text-[color:var(--color-text-soft)] max-w-[55%]"
@@ -168,12 +213,35 @@ function AgentApplyVisual() {
               style={{ padding: '0.9cqw 1.2cqw', fontSize: '1cqw' }}
             >
               Run{' '}
-              <span
-                className="rounded-[3px] bg-[color:var(--color-panel)] font-[family-name:var(--font-mono)] text-[color:var(--color-text)]"
+              <motion.span
+                className="rounded-[3px] font-[family-name:var(--font-mono)] text-[color:var(--color-text)]"
                 style={{ padding: '0.15cqw 0.4cqw' }}
+                animate={
+                  active
+                    ? {
+                        backgroundColor: [
+                          'var(--color-panel)',
+                          'var(--color-panel)',
+                          'color-mix(in oklab, var(--color-accent) 32%, var(--color-panel))',
+                          'var(--color-panel)',
+                          'var(--color-panel)',
+                        ],
+                      }
+                    : { backgroundColor: 'var(--color-panel)' }
+                }
+                transition={
+                  active
+                    ? {
+                        duration: 6,
+                        times: [0, 0.22, 0.3, 0.42, 1],
+                        ease: 'easeInOut',
+                        repeat: Infinity,
+                      }
+                    : undefined
+                }
               >
                 /apply-comments
-              </span>{' '}
+              </motion.span>{' '}
               in your agent to apply these.
             </div>
           </div>
@@ -210,8 +278,37 @@ function CommentGlyph() {
 }
 
 function VisualEditorVisual() {
+  const ref = useRef<HTMLDivElement>(null);
+  const inView = useInView(ref, { amount: 0.3 });
+  const reduced = useReducedMotion();
+  const active = inView && !reduced;
+
+  const progress = useMotionValue(0.38);
+  const fontSize = useTransform(progress, [0.38, 0.65], ['6.4cqw', '7.6cqw']);
+  const barWidth = useTransform(progress, (p) => `${p * 100}%`);
+  const thumbLeft = useTransform(progress, (p) => `calc(${p * 100}% - 0.55cqw)`);
+  const sizeNum = useTransform(progress, [0.38, 0.65], [88, 104]);
+  const sizeLabel = useTransform(sizeNum, (v) => `${Math.round(v)}px`);
+
+  useEffect(() => {
+    if (!active) {
+      progress.set(0.38);
+      return;
+    }
+    const controls = animate(progress, [0.38, 0.65, 0.65, 0.38, 0.38], {
+      duration: 6,
+      times: [0, 0.2, 0.5, 0.7, 1],
+      ease: 'easeInOut',
+      repeat: Infinity,
+    });
+    return () => controls.stop();
+  }, [active, progress]);
+
   return (
-    <div className="relative rounded-[6px] border border-[color:var(--color-rule)] bg-[color:var(--color-panel)] overflow-hidden">
+    <div
+      ref={ref}
+      className="relative rounded-[6px] border border-[color:var(--color-rule)] bg-[color:var(--color-panel)] overflow-hidden"
+    >
       <div
         className="relative aspect-[16/9] grid grid-cols-[1fr_42%]"
         style={{ containerType: 'inline-size' }}
@@ -227,12 +324,12 @@ function VisualEditorVisual() {
                 aria-hidden
                 className="absolute -inset-[0.6cqw] border-2 border-[#3b82f6] bg-[#3b82f6]/10 pointer-events-none"
               />
-              <span
+              <motion.span
                 className="relative font-[family-name:var(--font-sans)] font-semibold tracking-[-0.035em] leading-[1.0] text-[color:var(--color-accent)]"
-                style={{ fontSize: '6.4cqw' }}
+                style={{ fontSize }}
               >
                 Q2 Launch
-              </span>
+              </motion.span>
             </div>
             <span
               className="font-[family-name:var(--font-sans)] text-[color:var(--color-text-soft)] max-w-[80%]"
@@ -259,14 +356,26 @@ function VisualEditorVisual() {
                 className="inline-flex items-center gap-[0.5cqw] font-[family-name:var(--font-sans)] font-medium text-[color:var(--color-text)]"
                 style={{ padding: '0 0.7cqw', fontSize: '1.25cqw' }}
               >
-                <span
+                <motion.span
                   className="rounded-full bg-[color:var(--color-accent)]"
-                  style={{
-                    width: '0.7cqw',
-                    height: '0.7cqw',
-                    boxShadow:
-                      '0 0 0 0.3cqw color-mix(in oklab, var(--color-accent) 18%, transparent)',
-                  }}
+                  style={{ width: '0.7cqw', height: '0.7cqw' }}
+                  animate={
+                    active
+                      ? {
+                          boxShadow: [
+                            '0 0 0 0.3cqw color-mix(in oklab, var(--color-accent) 18%, transparent)',
+                            '0 0 0 0.55cqw color-mix(in oklab, var(--color-accent) 6%, transparent)',
+                            '0 0 0 0.3cqw color-mix(in oklab, var(--color-accent) 18%, transparent)',
+                          ],
+                        }
+                      : {
+                          boxShadow:
+                            '0 0 0 0.3cqw color-mix(in oklab, var(--color-accent) 18%, transparent)',
+                        }
+                  }
+                  transition={
+                    active ? { duration: 2.2, repeat: Infinity, ease: 'easeInOut' } : undefined
+                  }
                 />
                 <span>1 unsaved change</span>
               </span>
@@ -325,20 +434,25 @@ function VisualEditorVisual() {
           <PanelSection label="Typography">
             <PanelRow label="Size">
               <div className="flex-1 h-[0.5cqw] rounded-full bg-[color:var(--color-panel)] relative">
-                <div
+                <motion.div
                   className="absolute left-0 top-0 bottom-0 rounded-full bg-[color:var(--color-accent)]"
-                  style={{ width: '38%' }}
+                  style={{ width: barWidth }}
                 />
-                <div
+                <motion.div
                   className="absolute top-1/2 -translate-y-1/2 rounded-full bg-[color:var(--color-text)] border border-[color:var(--color-accent)]"
                   style={{
                     width: '1.1cqw',
                     height: '1.1cqw',
-                    left: 'calc(38% - 0.55cqw)',
+                    left: thumbLeft,
                   }}
                 />
               </div>
-              <PanelInput value="88px" />
+              <motion.span
+                className="flex-1 rounded-[4px] border border-[color:var(--color-rule)] bg-[color:var(--color-panel)] text-[color:var(--color-text)] font-[family-name:var(--font-mono)]"
+                style={{ fontSize: '1.05cqw', padding: '0.4cqw 0.6cqw' }}
+              >
+                {sizeLabel}
+              </motion.span>
             </PanelRow>
             <PanelRow label="Weight">
               <PanelSelect value="Semibold · 600" />
