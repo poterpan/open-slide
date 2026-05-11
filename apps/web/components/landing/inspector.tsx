@@ -484,7 +484,7 @@ function VisualEditorVisual() {
           {/* SaveBar — matches core/SaveCard layout */}
           <div className="absolute left-1/2 -translate-x-1/2" style={{ bottom: '3cqw' }}>
             <div
-              className="inline-flex items-center gap-[0.4cqw] rounded-[6px] border border-[color:var(--color-rule)] bg-[color:var(--color-panel-hi)]/95 backdrop-blur-md shadow-[0_8px_24px_-12px_rgba(0,0,0,0.35)]"
+              className="inline-flex items-center gap-[0.4cqw] whitespace-nowrap rounded-[6px] border border-[color:var(--color-rule)] bg-[color:var(--color-panel-hi)]/95 backdrop-blur-md shadow-[0_8px_24px_-12px_rgba(0,0,0,0.35)]"
               style={{ padding: '0.35cqw 0.35cqw 0.35cqw 0.5cqw' }}
             >
               <SaveBarIconBtn glyph={<UndoGlyph />} />
