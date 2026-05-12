@@ -6,7 +6,7 @@ export const design: DesignSystem = {
     display: "'JetBrains Mono', 'SF Mono', Menlo, Consolas, monospace",
     body: "'JetBrains Mono', 'SF Mono', Menlo, Consolas, monospace",
   },
-  typeScale: { hero: 156, body: 24 },
+  typeScale: { hero: 184, body: 24 },
   radius: 0,
 };
 
@@ -94,14 +94,27 @@ const Eyebrow = ({ children, delay = 0 }: { children: React.ReactNode; delay?: n
     className="h-fadeup"
     style={{
       animationDelay: `${delay}ms`,
-      fontSize: 24,
+      fontSize: 14,
       fontWeight: 500,
       color: 'var(--osd-accent)',
-      textShadow: '0 0 12px rgba(57, 255, 136, 0.5)',
-      letterSpacing: '0.04em',
+      textShadow: '0 0 10px rgba(57, 255, 136, 0.5)',
+      letterSpacing: '0.32em',
+      textTransform: 'uppercase',
+      display: 'inline-flex',
+      alignItems: 'center',
+      gap: 14,
     }}
   >
-    [{children}]
+    <span
+      aria-hidden
+      style={{
+        width: 28,
+        height: 1,
+        background: 'var(--osd-accent)',
+        boxShadow: '0 0 8px rgba(57,255,136,0.6)',
+      }}
+    />
+    [ {children} ]
   </div>
 );
 
@@ -127,22 +140,46 @@ const Footer = ({ pageNum, section }: { pageNum: number; section?: string }) => 
       position: 'absolute',
       left: tokens.space.padX,
       right: tokens.space.padX,
-      bottom: 36,
+      bottom: 40,
       display: 'flex',
       justifyContent: 'space-between',
+      alignItems: 'center',
       fontFamily: 'var(--osd-font-body)',
-      fontSize: 20,
+      fontSize: 13,
       color: tokens.color.faint,
       borderTop: `1px solid ${tokens.color.line}`,
-      paddingTop: 14,
+      paddingTop: 18,
+      letterSpacing: '0.22em',
+      textTransform: 'uppercase',
+      animation: 'hFade 1000ms ease 800ms both',
     }}
   >
-    <span>
-      <span style={{ color: 'var(--osd-accent)' }}>●</span> {section ?? 'main'} ·{' '}
+    <span style={{ display: 'inline-flex', alignItems: 'center', gap: 12 }}>
+      <span
+        aria-hidden
+        style={{
+          width: 6,
+          height: 6,
+          borderRadius: '50%',
+          background: 'var(--osd-accent)',
+          boxShadow: '0 0 10px rgba(57,255,136,0.65)',
+        }}
+      />
+      {section ?? 'main'}
+      <span style={{ color: tokens.color.line }}>/</span>
       <span style={{ color: tokens.color.accent2 }}>~/deck/harness-engineering</span>
     </span>
-    <span>
-      {String(pageNum).padStart(2, '0')}/{String(tokens.meta.totalPages).padStart(2, '0')}
+    <span
+      style={{
+        fontVariantNumeric: 'tabular-nums',
+        display: 'inline-flex',
+        gap: 6,
+        letterSpacing: '0.18em',
+      }}
+    >
+      <span style={{ color: 'var(--osd-text)' }}>{String(pageNum).padStart(2, '0')}</span>
+      <span style={{ opacity: 0.4 }}>/</span>
+      <span>{String(tokens.meta.totalPages).padStart(2, '0')}</span>
     </span>
   </div>
 );
@@ -1107,10 +1144,10 @@ const Closing: Page = () => (
     <h2
       style={{
         fontFamily: 'var(--osd-font-display)',
-        fontSize: 132,
+        fontSize: 156,
         fontWeight: 700,
-        lineHeight: 1.02,
-        letterSpacing: '-0.025em',
+        lineHeight: 0.98,
+        letterSpacing: '-0.035em',
         margin: 0,
         color: 'var(--osd-text)',
         position: 'relative',
@@ -1124,11 +1161,11 @@ const Closing: Page = () => (
         className="h-typein"
         style={{
           display: 'block',
-          animationDelay: '900ms',
+          animationDelay: '1100ms',
         }}
       >
         <span style={{ color: tokens.color.muted }}>is</span>{' '}
-        <span style={{ color: 'var(--osd-accent)', textShadow: '0 0 22px rgba(57,255,136,0.5)' }}>
+        <span style={{ color: 'var(--osd-accent)', textShadow: '0 0 24px rgba(57,255,136,0.55)' }}>
           the product.
         </span>
         <Cursor size="0.5em" height="0.85em" />
