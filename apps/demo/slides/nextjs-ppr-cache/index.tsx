@@ -108,19 +108,33 @@ const Footer = ({ page, total }: { page: number; total: number }) => (
       display: 'flex',
       justifyContent: 'space-between',
       alignItems: 'center',
-      fontSize: 20,
+      fontSize: 13,
       fontFamily: fontMono,
-      color: palette.subtle,
+      color: palette.muted,
       borderTop: `1px solid ${palette.border}`,
-      paddingTop: 22,
+      paddingTop: 20,
+      letterSpacing: '0.22em',
+      textTransform: 'uppercase',
+      animation: 'ppr-fade 1000ms ease 800ms both',
     }}
   >
     <span style={{ display: 'inline-flex', alignItems: 'center', gap: 10 }}>
-      <img src={nextMark} alt="Next.js" style={{ height: 22, width: 22, display: 'block' }} />
-      <span>Next.js · partial pre-rendering &amp; 'use cache'</span>
+      <img src={nextMark} alt="Next.js" style={{ height: 16, width: 16, display: 'block' }} />
+      <span>Next.js</span>
+      <span style={{ color: palette.border }}>/</span>
+      <span style={{ color: palette.subtle }}>partial pre-rendering &amp; 'use cache'</span>
     </span>
-    <span>
-      {String(page).padStart(2, '0')} / {String(total).padStart(2, '0')}
+    <span
+      style={{
+        fontVariantNumeric: 'tabular-nums',
+        display: 'inline-flex',
+        gap: 6,
+        letterSpacing: '0.18em',
+      }}
+    >
+      <span style={{ color: palette.text }}>{String(page).padStart(2, '0')}</span>
+      <span style={{ opacity: 0.4 }}>/</span>
+      <span>{String(total).padStart(2, '0')}</span>
     </span>
   </div>
 );
@@ -128,25 +142,26 @@ const Footer = ({ page, total }: { page: number; total: number }) => (
 const Eyebrow = ({ index, label }: { index: string; label: string }) => (
   <div
     style={{
-      display: 'flex',
+      display: 'inline-flex',
       alignItems: 'center',
-      gap: 16,
-      fontSize: 22,
+      gap: 14,
+      fontSize: 14,
       fontFamily: fontMono,
       color: palette.muted,
-      letterSpacing: '0.02em',
+      letterSpacing: '0.22em',
+      textTransform: 'uppercase',
     }}
   >
     <span
+      aria-hidden
       style={{
-        width: 10,
-        height: 10,
-        borderRadius: '50%',
+        width: 28,
+        height: 1,
         background: palette.text,
       }}
     />
     <span style={{ fontWeight: 600, color: palette.text }}>{index}</span>
-    <span style={{ color: palette.border }}>—</span>
+    <span style={{ color: palette.border }}>/</span>
     <span>{label}</span>
   </div>
 );
