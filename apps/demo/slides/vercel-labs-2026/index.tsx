@@ -152,7 +152,6 @@ const Triangle = ({ size = 14, color = palette.text }: { size?: number; color?: 
 
 const MetaRow = ({ index, total }: { index?: string; total?: string }) => (
   <div
-    className="vl-fade"
     style={{
       position: 'absolute',
       top: 64,
@@ -166,7 +165,6 @@ const MetaRow = ({ index, total }: { index?: string; total?: string }) => (
       color: palette.muted,
       letterSpacing: '0.2em',
       textTransform: 'uppercase',
-      animationDelay: '120ms',
     }}
   >
     <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
