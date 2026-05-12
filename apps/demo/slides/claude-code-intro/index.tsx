@@ -42,6 +42,25 @@ const PAD_X = 140;
 const PAD_Y = 120;
 const PAD_Y_BOTTOM = 200;
 
+const EASE_OUT = 'cubic-bezier(0.16, 1, 0.3, 1)';
+const TOTAL = 9;
+
+const keyframes = `
+@keyframes cc-reveal {
+  0%   { opacity: 0; transform: translateY(36px); filter: blur(8px); }
+  100% { opacity: 1; transform: translateY(0);    filter: blur(0); }
+}
+@keyframes cc-rise {
+  0%   { opacity: 0; transform: translateY(22px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+@keyframes cc-line {
+  0%   { transform: scaleX(0); opacity: 0; }
+  100% { transform: scaleX(1); opacity: 1; }
+}
+@keyframes cc-fade { 0% { opacity: 0; } 100% { opacity: 1; } }
+`;
+
 /* ─────────────── Subtle paper grain ─────────────── */
 
 const Grain = () => (
@@ -90,25 +109,35 @@ const fill = {
 const Eyebrow = ({
   children,
   color = 'var(--osd-accent)',
+  delay = 0,
 }: {
   children: React.ReactNode;
   color?: string;
+  delay?: number;
 }) => (
-  <div
-    style={{
-      fontFamily: 'var(--osd-font-body)',
-      fontSize: 22,
-      fontWeight: 500,
-      letterSpacing: '0.32em',
-      textTransform: 'uppercase',
-      color,
-    }}
-  >
-    {children}
-  </div>
+  <>
+    <style>{keyframes}</style>
+    <div
+      style={{
+        fontFamily: 'var(--osd-font-body)',
+        fontSize: 14,
+        fontWeight: 600,
+        letterSpacing: '0.32em',
+        textTransform: 'uppercase',
+        color,
+        display: 'inline-flex',
+        alignItems: 'center',
+        gap: 16,
+        animation: `cc-rise 900ms ${EASE_OUT} ${delay}ms both`,
+      }}
+    >
+      <span aria-hidden style={{ width: 28, height: 1, background: color }} />
+      {children}
+    </div>
+  </>
 );
 
-const Footer = ({ section }: { section: string }) => (
+const Footer = ({ section, n }: { section: string; n: number }) => (
   <div
     style={{
       position: 'absolute',
@@ -116,17 +145,38 @@ const Footer = ({ section }: { section: string }) => (
       right: PAD_X,
       bottom: 72,
       display: 'flex',
-      alignItems: 'baseline',
+      justifyContent: 'space-between',
+      alignItems: 'center',
       fontFamily: 'var(--osd-font-body)',
-      fontSize: 18,
-      letterSpacing: '0.28em',
+      fontSize: 13,
+      fontWeight: 600,
+      letterSpacing: '0.32em',
       textTransform: 'uppercase',
       color: palette.muted,
-      borderTop: `1px dashed ${palette.rule}`,
+      borderTop: `1px solid ${palette.line}`,
       paddingTop: 18,
+      animation: `cc-fade 1000ms ease 800ms both`,
     }}
   >
-    <span>Claude Code · {section}</span>
+    <span style={{ display: 'inline-flex', alignItems: 'center', gap: 12 }}>
+      <span
+        aria-hidden
+        style={{ width: 6, height: 6, borderRadius: '50%', background: 'var(--osd-accent)' }}
+      />
+      Claude Code <span style={{ color: palette.faint }}>/</span> {section}
+    </span>
+    <span
+      style={{
+        fontVariantNumeric: 'tabular-nums',
+        display: 'inline-flex',
+        gap: 6,
+        letterSpacing: '0.18em',
+      }}
+    >
+      <span style={{ color: 'var(--osd-text)' }}>{String(n).padStart(2, '0')}</span>
+      <span style={{ opacity: 0.4 }}>/</span>
+      <span>{String(TOTAL).padStart(2, '0')}</span>
+    </span>
   </div>
 );
 
@@ -158,6 +208,7 @@ const Cover: Page = () => (
       justifyContent: 'center',
     }}
   >
+    <style>{keyframes}</style>
     <Grain />
     <div style={{ position: 'relative', zIndex: 1 }}>
       <Eyebrow>A field guide · 2026</Eyebrow>
@@ -167,9 +218,10 @@ const Cover: Page = () => (
           fontSize: 'var(--osd-size-hero)',
           fontWeight: 400,
           lineHeight: 0.98,
-          letterSpacing: '-0.03em',
+          letterSpacing: '-0.035em',
           margin: '36px 0 0',
           color: 'var(--osd-text)',
+          animation: `cc-reveal 1200ms ${EASE_OUT} 200ms both`,
         }}
       >
         Claude
@@ -182,6 +234,8 @@ const Cover: Page = () => (
           width: 560,
           background: palette.rule,
           margin: '64px 0 36px',
+          transformOrigin: 'left',
+          animation: `cc-line 1000ms ${EASE_OUT} 700ms both`,
         }}
       />
       <p
@@ -194,6 +248,7 @@ const Cover: Page = () => (
           margin: 0,
           fontWeight: 400,
           fontStyle: 'italic',
+          animation: `cc-rise 1000ms ${EASE_OUT} 880ms both`,
         }}
       >
         An agentic coding assistant that lives where you already work — the terminal, the editor,
@@ -206,12 +261,13 @@ const Cover: Page = () => (
           fontSize: 26,
           color: palette.muted,
           letterSpacing: '-0.01em',
+          animation: `cc-fade 900ms ease 1200ms both`,
         }}
       >
-        $ claude
+        <span style={{ color: 'var(--osd-accent)' }}>$ </span>claude
       </div>
     </div>
-    <Footer section="No. 01 · Cover" />
+    <Footer section="Cover" n={1} />
   </div>
 );
 
@@ -273,7 +329,7 @@ const WhatIs: Page = () => (
         across files, tools, and turns.
       </p>
     </div>
-    <Footer section="No. 02 · Definition" />
+    <Footer section="Definition" n={2} />
   </div>
 );
 
@@ -373,7 +429,7 @@ const Capabilities: Page = () => (
         ))}
       </div>
     </div>
-    <Footer section="No. 03 · Capabilities" />
+    <Footer section="Capabilities" n={3} />
   </div>
 );
 
@@ -539,7 +595,7 @@ const TheLoop: Page = () => (
         </div>
       </div>
     </div>
-    <Footer section="No. 04 · The Loop" />
+    <Footer section="The Loop" n={4} />
   </div>
 );
 
@@ -652,7 +708,7 @@ const Permissions: Page = () => (
         </div>
       </div>
     </div>
-    <Footer section="No. 05 · Control" />
+    <Footer section="Control" n={5} />
   </div>
 );
 
@@ -766,7 +822,7 @@ const WhereItRuns: Page = () => (
         ))}
       </div>
     </div>
-    <Footer section="No. 06 · Surfaces" />
+    <Footer section="Surfaces" n={6} />
   </div>
 );
 
@@ -843,7 +899,7 @@ const Different: Page = () => (
         ))}
       </div>
     </div>
-    <Footer section="No. 07 · Difference" />
+    <Footer section="Difference" n={7} />
   </div>
 );
 
@@ -946,7 +1002,7 @@ const Transcript: Page = () => (
         })}
       </div>
     </div>
-    <Footer section="No. 08 · Transcript" />
+    <Footer section="Transcript" n={8} />
   </div>
 );
 
@@ -962,22 +1018,33 @@ const GetStarted: Page = () => (
       justifyContent: 'center',
     }}
   >
+    <style>{keyframes}</style>
     <Grain />
     <div style={{ position: 'relative', zIndex: 1 }}>
       <Eyebrow>Get started</Eyebrow>
       <h2
         style={{
           fontFamily: 'var(--osd-font-display)',
-          fontSize: 168,
+          fontSize: 184,
           fontWeight: 400,
           lineHeight: 1,
-          letterSpacing: '-0.03em',
+          letterSpacing: '-0.035em',
           margin: '36px 0 0',
+          animation: `cc-reveal 1200ms ${EASE_OUT} 200ms both`,
         }}
       >
-        Two lines.
+        Two <em style={{ fontStyle: 'italic', color: 'var(--osd-accent)' }}>lines.</em>
       </h2>
-      <div style={{ height: 1, background: palette.rule, width: 480, margin: '64px 0 48px' }} />
+      <div
+        style={{
+          height: 1,
+          background: palette.rule,
+          width: 480,
+          margin: '64px 0 48px',
+          transformOrigin: 'left',
+          animation: `cc-line 1000ms ${EASE_OUT} 700ms both`,
+        }}
+      />
 
       <div
         style={{
@@ -990,6 +1057,7 @@ const GetStarted: Page = () => (
           lineHeight: 1.6,
           maxWidth: 1400,
           letterSpacing: '-0.01em',
+          animation: `cc-rise 1000ms ${EASE_OUT} 880ms both`,
         }}
       >
         <div>
@@ -1011,6 +1079,7 @@ const GetStarted: Page = () => (
           fontSize: 24,
           color: palette.muted,
           letterSpacing: '0.04em',
+          animation: `cc-fade 900ms ease 1200ms both`,
         }}
       >
         <span>
@@ -1029,12 +1098,13 @@ const GetStarted: Page = () => (
           fontStyle: 'italic',
           fontSize: 32,
           color: palette.faint,
+          animation: `cc-fade 900ms ease 1500ms both`,
         }}
       >
         — go build something.
       </div>
     </div>
-    <Footer section="No. 09 · Start" />
+    <Footer section="Start" n={9} />
   </div>
 );
 
