@@ -27,10 +27,18 @@
     "scaffold"
   ],
   "license": "MIT",
+  "author": {
+    "name": "1weiho",
+    "url": "https://github.com/1weiho"
+  },
+  "homepage": "https://open-slide.dev",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/1weiho/open-slide.git",
     "directory": "packages/cli"
+  },
+  "bugs": {
+    "url": "https://github.com/1weiho/open-slide/issues"
   },
   "publishConfig": {
     "access": "public"
