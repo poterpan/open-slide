@@ -387,7 +387,7 @@ const Thesis: Page = () => {
       <Style />
       <Grid opacity={0.3} />
       <GradientOrb x="110%" y="50%" size={1300} color={palette.violet} opacity={0.1} />
-      <MetaRow index="02" total="11" />
+      <MetaRow index="02" total="10" />
 
       <div
         style={{
@@ -493,147 +493,6 @@ const Thesis: Page = () => {
 };
 
 // ────────────────────────────────────────────────────────────────────────────
-// 03 — Lineup (Index)
-// ────────────────────────────────────────────────────────────────────────────
-const Lineup: Page = () => {
-  const rows: Array<{ n: string; name: string; pitch: string; color: string }> = [
-    {
-      n: '01',
-      name: 'agent-browser',
-      pitch: 'A browser, made legible to LLMs.',
-      color: palette.cyan,
-    },
-    {
-      n: '02',
-      name: 'just-bash',
-      pitch: 'A shell that cannot touch the host.',
-      color: palette.green,
-    },
-    {
-      n: '03',
-      name: 'open-agents',
-      pitch: 'Background coding agents on Vercel.',
-      color: palette.violet,
-    },
-    { n: '04', name: 'portless', pitch: 'Stable URLs replace port numbers.', color: palette.blue },
-    {
-      n: '05',
-      name: 'json-render',
-      pitch: 'Generative UI, schema-conformant.',
-      color: palette.pink,
-    },
-    {
-      n: '06',
-      name: 'zero-native',
-      pitch: 'Native desktop, written in Zig.',
-      color: palette.amber,
-    },
-  ];
-
-  return (
-    <div style={fill}>
-      <Style />
-      <Grid opacity={0.3} />
-      <GradientOrb x="-5%" y="50%" size={1000} color={palette.blue} opacity={0.08} />
-      <MetaRow index="03" total="11" />
-
-      <div
-        style={{
-          position: 'absolute',
-          top: 220,
-          left: 120,
-          right: 120,
-          display: 'flex',
-          flexDirection: 'column',
-          gap: 28,
-        }}
-      >
-        <Eyebrow dot={palette.violet} delay={120}>
-          02 — Index
-        </Eyebrow>
-
-        <div
-          className="vl-sweep"
-          style={{
-            height: 1,
-            background: palette.lineStrong,
-            animationDelay: '320ms',
-          }}
-        />
-
-        <div style={{ marginTop: -8 }}>
-          {rows.map((r, i) => (
-            <div
-              key={r.n}
-              className="vl-rise"
-              style={{
-                display: 'grid',
-                gridTemplateColumns: '110px 1fr',
-                alignItems: 'center',
-                gap: 40,
-                padding: '14px 0',
-                borderBottom: `1px solid ${palette.line}`,
-                animationDelay: `${380 + i * 80}ms`,
-              }}
-            >
-              <div
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 12,
-                  fontFamily: fonts.mono,
-                  fontSize: 17,
-                  letterSpacing: '0.18em',
-                  color: r.color,
-                  lineHeight: 1,
-                }}
-              >
-                <span
-                  style={{
-                    width: 7,
-                    height: 7,
-                    background: r.color,
-                    boxShadow: `0 0 12px ${r.color}`,
-                  }}
-                />
-                {r.n}
-              </div>
-              <div style={{ display: 'flex', alignItems: 'baseline', gap: 28 }}>
-                <div
-                  style={{
-                    fontFamily: fonts.sans,
-                    fontSize: 46,
-                    lineHeight: 1.05,
-                    fontWeight: 600,
-                    letterSpacing: '-0.035em',
-                    color: palette.text,
-                  }}
-                >
-                  {r.name}
-                </div>
-                <div
-                  style={{
-                    fontFamily: fonts.sans,
-                    fontSize: 22,
-                    lineHeight: 1.2,
-                    color: palette.muted,
-                    letterSpacing: '-0.01em',
-                  }}
-                >
-                  {r.pitch}
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      <FooterRule note="III · Index" />
-    </div>
-  );
-};
-
-// ────────────────────────────────────────────────────────────────────────────
 // Shared project-page pieces
 // ────────────────────────────────────────────────────────────────────────────
 const PageFrame = ({
@@ -652,7 +511,7 @@ const PageFrame = ({
     <Grid opacity={0.28} />
     <GradientOrb x="110%" y="-10%" size={1200} color={accent} opacity={0.16} />
     <GradientOrb x="-10%" y="115%" size={900} color={accent} opacity={0.05} />
-    <MetaRow index={pageIndex} total="11" />
+    <MetaRow index={pageIndex} total="10" />
     {children}
     <FooterRule note={note} />
   </div>
@@ -917,7 +776,7 @@ const refRow = (
 );
 
 const AgentBrowser: Page = () => (
-  <PageFrame pageIndex="04" accent={palette.cyan} note="IV · agent-browser">
+  <PageFrame pageIndex="03" accent={palette.cyan} note="IV · agent-browser">
     <ProjectGrid>
       <LeftCol
         category="01 · Browser · Rust CLI"
@@ -999,7 +858,7 @@ const cmdLine = (cmd: string, output: string, status: 'ok' | 'deny' | 'note', ac
 };
 
 const JustBash: Page = () => (
-  <PageFrame pageIndex="05" accent={palette.green} note="V · just-bash">
+  <PageFrame pageIndex="04" accent={palette.green} note="V · just-bash">
     <ProjectGrid>
       <LeftCol
         category="02 · Shell · TypeScript"
@@ -1099,7 +958,7 @@ const sessionRow = (title: string, meta: string, status: SessionStatus, accent: 
 };
 
 const OpenAgents: Page = () => (
-  <PageFrame pageIndex="06" accent={palette.violet} note="VI · open-agents">
+  <PageFrame pageIndex="05" accent={palette.violet} note="VI · open-agents">
     <ProjectGrid>
       <LeftCol
         category="03 · Orchestrator · Reference App"
@@ -1198,7 +1057,7 @@ const portRow = (port: string, name: string, idx: number) => (
 );
 
 const Portless: Page = () => (
-  <PageFrame pageIndex="07" accent={palette.blue} note="VII · portless">
+  <PageFrame pageIndex="06" accent={palette.blue} note="VII · portless">
     <div
       style={{
         position: 'absolute',
@@ -1362,7 +1221,7 @@ const Portless: Page = () => (
 // 08 — json-render  (split: JSON spec ↓ rendered card)
 // ────────────────────────────────────────────────────────────────────────────
 const JsonRender: Page = () => (
-  <PageFrame pageIndex="08" accent={palette.pink} note="VIII · json-render">
+  <PageFrame pageIndex="07" accent={palette.pink} note="VIII · json-render">
     <ProjectGrid>
       <LeftCol
         category="05 · Gen-UI · Multi-runtime"
@@ -1607,7 +1466,7 @@ const statCell = (label: string, value: string, sub: string, idx: number) => (
 );
 
 const ZeroNative: Page = () => (
-  <PageFrame pageIndex="09" accent={palette.amber} note="IX · zero-native">
+  <PageFrame pageIndex="08" accent={palette.amber} note="IX · zero-native">
     <ProjectGrid>
       <LeftCol
         category="06 · Runtime · Desktop"
@@ -1727,7 +1586,7 @@ const Stack: Page = () => {
       <Style />
       <Grid opacity={0.28} />
       <GradientOrb x="50%" y="55%" size={1500} color={palette.violet} opacity={0.1} />
-      <MetaRow index="10" total="11" />
+      <MetaRow index="09" total="10" />
 
       <div
         style={{
@@ -1741,7 +1600,7 @@ const Stack: Page = () => {
         }}
       >
         <Eyebrow dot={palette.amber} delay={120}>
-          04 — Composition
+          02 — Composition
         </Eyebrow>
 
         <div
@@ -1852,7 +1711,7 @@ const Closer: Page = () => (
     <GradientOrb x="-10%" y="-5%" size={1600} color={palette.pink} opacity={0.16} />
     <GradientOrb x="110%" y="115%" size={1600} color={palette.cyan} opacity={0.16} />
     <GradientOrb x="55%" y="55%" size={900} color={palette.violet} opacity={0.06} />
-    <MetaRow index="11" total="11" />
+    <MetaRow index="10" total="10" />
 
     <div
       style={{
@@ -1867,7 +1726,7 @@ const Closer: Page = () => (
       }}
     >
       <Eyebrow dot={palette.cyan} delay={120}>
-        05 — Takeaway
+        03 — Takeaway
       </Eyebrow>
 
       <div
@@ -1919,7 +1778,6 @@ const Closer: Page = () => (
 export default [
   Cover,
   Thesis,
-  Lineup,
   AgentBrowser,
   JustBash,
   OpenAgents,
