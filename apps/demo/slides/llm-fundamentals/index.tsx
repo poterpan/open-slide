@@ -111,31 +111,70 @@ const Eyebrow = ({ children, delay = 0 }: { children: React.ReactNode; delay?: n
     style={{
       animationDelay: `${delay}ms`,
       fontFamily: 'var(--osd-font-body)',
-      fontSize: 22,
-      fontWeight: 500,
+      fontSize: 14,
+      fontWeight: 600,
       letterSpacing: '0.32em',
       textTransform: 'uppercase',
       color: 'var(--osd-accent)',
+      display: 'inline-flex',
+      alignItems: 'center',
+      gap: 16,
     }}
   >
+    <span aria-hidden style={{ width: 28, height: 1, background: 'var(--osd-accent)' }} />
     {children}
   </div>
 );
 
-const PageNumber = ({ n, total }: { n: number; total: number }) => (
+const PageNumber = ({
+  n,
+  total,
+  section = 'main',
+}: {
+  n: number;
+  total: number;
+  section?: string;
+}) => (
   <div
+    className="l-fade"
     style={{
+      animationDelay: '800ms',
       position: 'absolute',
       left: PAD_X,
+      right: PAD_X,
       bottom: 60,
+      display: 'flex',
+      justifyContent: 'space-between',
+      alignItems: 'center',
       fontFamily: 'var(--osd-font-body)',
-      fontSize: 18,
+      fontSize: 13,
+      fontWeight: 600,
       letterSpacing: '0.3em',
       textTransform: 'uppercase',
-      color: palette.faint,
+      color: palette.muted,
+      borderTop: `1px solid ${palette.line}`,
+      paddingTop: 18,
     }}
   >
-    LLM · {String(n).padStart(2, '0')} / {String(total).padStart(2, '0')}
+    <span style={{ display: 'inline-flex', alignItems: 'center', gap: 12 }}>
+      <span
+        aria-hidden
+        style={{ width: 6, height: 6, borderRadius: '50%', background: 'var(--osd-accent)' }}
+      />
+      LLM Fundamentals <span style={{ color: palette.faint }}>/</span> {section}
+    </span>
+    <span
+      style={{
+        fontVariantNumeric: 'tabular-nums',
+        display: 'inline-flex',
+        gap: 6,
+        letterSpacing: '0.18em',
+      }}
+    >
+      <span style={{ color: 'var(--osd-text)' }}>{String(n).padStart(2, '0')}</span>
+      <span style={{ opacity: 0.4 }}>/</span>
+      <span>{String(total).padStart(2, '0')}</span>
+    </span>
   </div>
 );
 
@@ -249,13 +288,13 @@ const Cover: Page = () => (
       <h1
         className="l-fadeup"
         style={{
-          animationDelay: '180ms',
+          animationDelay: '240ms',
           fontFamily: 'var(--osd-font-display)',
           fontSize: 'var(--osd-size-hero)',
           fontWeight: 400,
-          lineHeight: 1.02,
-          letterSpacing: '-0.025em',
-          margin: '40px 0 0',
+          lineHeight: 0.98,
+          letterSpacing: '-0.035em',
+          margin: '36px 0 0',
           color: 'var(--osd-text)',
         }}
       >
