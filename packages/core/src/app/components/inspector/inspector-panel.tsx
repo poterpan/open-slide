@@ -439,7 +439,7 @@ function ContentField({
       onSelect={(e) => reportSelection(e.currentTarget)}
       wrap="off"
       rows={3}
-      className="min-h-16 resize-none overflow-x-auto whitespace-pre text-xs"
+      className="field-sizing-fixed min-h-16 w-full resize-none overflow-x-auto whitespace-pre text-xs"
       placeholder={t.inspector.elementTextPlaceholder}
     />
   );
