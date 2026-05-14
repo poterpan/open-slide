@@ -93,6 +93,8 @@ export const zhTW: Locale = {
     exportAsHtml: '匯出為 HTML',
     exportAsPdf: '匯出為 PDF',
     pdfExportFailed: 'PDF 匯出失敗',
+    pdfExportSafariUnsupported:
+      '匯出 PDF 目前不支援 Safari 裝置，請嘗試用 Chromium 基底瀏覽器替代。',
     present: '簡報',
     slidesTab: '投影片',
     assetsTab: '素材',

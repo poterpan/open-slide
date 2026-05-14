@@ -94,6 +94,8 @@ export const en: Locale = {
     exportAsHtml: 'Export as HTML',
     exportAsPdf: 'Export as PDF',
     pdfExportFailed: 'PDF export failed',
+    pdfExportSafariUnsupported:
+      'Export as PDF is not supported on Safari. Please try a Chromium-based browser instead.',
     present: 'Present',
     slidesTab: 'Slides',
     assetsTab: 'Assets',

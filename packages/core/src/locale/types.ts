@@ -95,6 +95,7 @@ export type Locale = {
     exportAsHtml: string;
     exportAsPdf: string;
     pdfExportFailed: string;
+    pdfExportSafariUnsupported: string;
     present: string;
     slidesTab: string;
     assetsTab: string;

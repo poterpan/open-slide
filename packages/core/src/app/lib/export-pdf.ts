@@ -65,6 +65,12 @@ const PRINT_STYLES = `
 }
 `;
 
+export function isSafari(): boolean {
+  if (typeof navigator === 'undefined') return false;
+  const ua = navigator.userAgent;
+  return /Safari/.test(ua) && !/Chrome|Chromium|Edg|OPR|Firefox/.test(ua);
+}
+
 export type PdfExportProgress = {
   phase: 'processing' | 'printing' | 'done';
   /** Number of pages whose intro animations have finished (0..total). */

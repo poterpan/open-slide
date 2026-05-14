@@ -93,6 +93,8 @@ export const zhCN: Locale = {
     exportAsHtml: '导出为 HTML',
     exportAsPdf: '导出为 PDF',
     pdfExportFailed: 'PDF 导出失败',
+    pdfExportSafariUnsupported:
+      '导出 PDF 目前不支持 Safari 设备，请尝试使用基于 Chromium 的浏览器替代。',
     present: '演示',
     slidesTab: '幻灯片',
     assetsTab: '素材',

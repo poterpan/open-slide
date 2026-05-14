@@ -37,7 +37,7 @@ import { Player } from '../components/player';
 import { SlideCanvas } from '../components/slide-canvas';
 import { type ThumbnailActions, ThumbnailRail } from '../components/thumbnail-rail';
 import { exportSlideAsHtml } from '../lib/export-html';
-import { exportSlideAsPdf } from '../lib/export-pdf';
+import { exportSlideAsPdf, isSafari } from '../lib/export-pdf';
 import { remapNotesSessionCacheAfterReorder } from '../lib/inspector/use-notes';
 import type { SlideModule } from '../lib/sdk';
 import { useSlideModule } from '../lib/use-slide-module';
@@ -400,6 +400,10 @@ export function Slide() {
                       disabled={exporting}
                       onSelect={async () => {
                         if (!slide || exporting) return;
+                        if (isSafari()) {
+                          toast.error(t.slide.pdfExportSafariUnsupported, { duration: 5000 });
+                          return;
+                        }
                         setExporting(true);
                         const toastId = `pdf-export-${slideId}`;
                         toast.custom(
