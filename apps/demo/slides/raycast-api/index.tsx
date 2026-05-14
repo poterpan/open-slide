@@ -104,15 +104,18 @@ const Eyebrow = ({ children, delay = 0 }: { children: React.ReactNode; delay?: n
       animationDelay: `${delay}ms`,
     }}
   >
-    <span
-      style={{
-        width: 8,
-        height: 8,
-        borderRadius: '50%',
-        background: 'var(--osd-accent)',
-        boxShadow: `0 0 12px var(--osd-accent)`,
-      }}
-    />
+    <svg
+      width={32}
+      height={32}
+      viewBox="0 0 32 32"
+      style={{ display: 'block', flexShrink: 0, marginLeft: -8, marginRight: -4 }}
+      aria-hidden="true"
+    >
+      <circle cx={16} cy={16} r={14} fill="var(--osd-accent)" opacity={0.12} />
+      <circle cx={16} cy={16} r={10} fill="var(--osd-accent)" opacity={0.22} />
+      <circle cx={16} cy={16} r={6} fill="var(--osd-accent)" opacity={0.45} />
+      <circle cx={16} cy={16} r={4} fill="var(--osd-accent)" />
+    </svg>
     {children}
   </div>
 );
@@ -150,128 +153,144 @@ const CommandBar = ({
   query: string;
   results: { icon: string; title: string; sub: string; kbd?: string }[];
 }) => (
-  <div
-    style={{
-      width: 820,
-      borderRadius: 16,
-      background: palette.surface,
-      border: `1px solid ${palette.border}`,
-      boxShadow: '0 30px 80px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.03) inset',
-      overflow: 'hidden',
-    }}
-  >
+  <div style={{ position: 'relative', width: 820 }}>
+    <div
+      aria-hidden="true"
+      style={{
+        position: 'absolute',
+        top: -40,
+        left: -100,
+        right: -100,
+        bottom: -140,
+        background:
+          'radial-gradient(ellipse 50% 50% at 50% 70%, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.25) 35%, rgba(0,0,0,0) 65%)',
+        pointerEvents: 'none',
+      }}
+    />
     <div
       style={{
-        display: 'flex',
-        alignItems: 'center',
-        gap: 14,
-        padding: '18px 22px',
-        borderBottom: `1px solid ${palette.border}`,
+        position: 'relative',
+        width: 820,
+        borderRadius: 16,
+        background: palette.surface,
+        border: `1px solid ${palette.border}`,
+        boxShadow: '0 0 0 1px rgba(255,255,255,0.03) inset',
+        overflow: 'hidden',
       }}
     >
-      <img
-        src={raycastIcon}
-        alt="Raycast"
-        style={{
-          width: 32,
-          height: 32,
-          display: 'block',
-        }}
-      />
-      <div style={{ fontSize: 24, fontWeight: 500, flex: 1, color: 'var(--osd-text)' }}>
-        {query}
-        <span
-          className="rc-caret"
-          style={{
-            display: 'inline-block',
-            width: 2,
-            height: 24,
-            background: 'var(--osd-accent)',
-            marginLeft: 6,
-            verticalAlign: 'middle',
-          }}
-        />
-      </div>
-      <div style={{ display: 'flex', gap: 6 }}>
-        {['⌘', 'K'].map((k) => (
-          <span
-            key={k}
-            style={{
-              fontFamily: fonts.mono,
-              fontSize: 16,
-              padding: '4px 10px',
-              borderRadius: 6,
-              background: palette.surfaceHi,
-              color: palette.muted,
-              border: `1px solid ${palette.border}`,
-            }}
-          >
-            {k}
-          </span>
-        ))}
-      </div>
-    </div>
-    <div style={{ padding: '10px 12px' }}>
       <div
         style={{
-          fontSize: 14,
-          color: palette.muted,
-          padding: '6px 12px',
-          letterSpacing: '0.12em',
-          textTransform: 'uppercase',
+          display: 'flex',
+          alignItems: 'center',
+          gap: 14,
+          padding: '18px 22px',
+          borderBottom: `1px solid ${palette.border}`,
         }}
       >
-        Results
-      </div>
-      {results.map((r, i) => (
-        <div
-          key={i}
-          className="rc-fadeup"
+        <img
+          src={raycastIcon}
+          alt="Raycast"
           style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: 12,
-            padding: '12px',
-            borderRadius: 8,
-            background: i === 0 ? palette.accentSoft : 'transparent',
-            animationDelay: `${600 + i * 90}ms`,
+            width: 32,
+            height: 32,
+            display: 'block',
           }}
-        >
-          <div
+        />
+        <div style={{ fontSize: 24, fontWeight: 500, flex: 1, color: 'var(--osd-text)' }}>
+          {query}
+          <span
+            className="rc-caret"
             style={{
-              width: 32,
-              height: 32,
-              borderRadius: 6,
-              background: palette.surfaceHi,
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              fontSize: 18,
+              display: 'inline-block',
+              width: 2,
+              height: 24,
+              background: 'var(--osd-accent)',
+              marginLeft: 6,
+              verticalAlign: 'middle',
             }}
-          >
-            {r.icon}
-          </div>
-          <div style={{ flex: 1 }}>
-            <div style={{ fontSize: 18, fontWeight: 500 }}>{r.title}</div>
-            <div style={{ fontSize: 15, color: palette.muted, marginTop: 2 }}>{r.sub}</div>
-          </div>
-          {r.kbd && (
+          />
+        </div>
+        <div style={{ display: 'flex', gap: 6 }}>
+          {['⌘', 'K'].map((k) => (
             <span
+              key={k}
               style={{
                 fontFamily: fonts.mono,
-                fontSize: 14,
-                padding: '4px 8px',
-                borderRadius: 5,
+                fontSize: 16,
+                padding: '4px 10px',
+                borderRadius: 6,
                 background: palette.surfaceHi,
                 color: palette.muted,
                 border: `1px solid ${palette.border}`,
               }}
             >
-              {r.kbd}
+              {k}
             </span>
-          )}
+          ))}
         </div>
-      ))}
+      </div>
+      <div style={{ padding: '10px 12px' }}>
+        <div
+          style={{
+            fontSize: 14,
+            color: palette.muted,
+            padding: '6px 12px',
+            letterSpacing: '0.12em',
+            textTransform: 'uppercase',
+          }}
+        >
+          Results
+        </div>
+        {results.map((r, i) => (
+          <div
+            key={i}
+            className="rc-fadeup"
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 12,
+              padding: '12px',
+              borderRadius: 8,
+              background: i === 0 ? palette.accentSoft : 'transparent',
+              animationDelay: `${600 + i * 90}ms`,
+            }}
+          >
+            <div
+              style={{
+                width: 32,
+                height: 32,
+                borderRadius: 6,
+                background: palette.surfaceHi,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontSize: 18,
+              }}
+            >
+              {r.icon}
+            </div>
+            <div style={{ flex: 1 }}>
+              <div style={{ fontSize: 18, fontWeight: 500 }}>{r.title}</div>
+              <div style={{ fontSize: 15, color: palette.muted, marginTop: 2 }}>{r.sub}</div>
+            </div>
+            {r.kbd && (
+              <span
+                style={{
+                  fontFamily: fonts.mono,
+                  fontSize: 14,
+                  padding: '4px 8px',
+                  borderRadius: 5,
+                  background: palette.surfaceHi,
+                  color: palette.muted,
+                  border: `1px solid ${palette.border}`,
+                }}
+              >
+                {r.kbd}
+              </span>
+            )}
+          </div>
+        ))}
+      </div>
     </div>
   </div>
 );
@@ -601,14 +620,27 @@ const ActionPanel: Page = () => (
           your extension feels native to Raycast.
         </p>
       </div>
-      <div className="rc-fade" style={{ animationDelay: '300ms' }}>
+      <div className="rc-fade" style={{ animationDelay: '300ms', position: 'relative' }}>
+        <div
+          aria-hidden="true"
+          style={{
+            position: 'absolute',
+            top: -30,
+            left: -80,
+            right: -80,
+            bottom: -110,
+            background:
+              'radial-gradient(ellipse 50% 50% at 50% 70%, rgba(0,0,0,0.5) 0%, rgba(0,0,0,0.22) 35%, rgba(0,0,0,0) 65%)',
+            pointerEvents: 'none',
+          }}
+        />
         <div
           style={{
+            position: 'relative',
             width: 540,
             borderRadius: 'var(--osd-radius)',
             background: palette.surface,
             border: `1px solid ${palette.border}`,
-            boxShadow: '0 24px 60px rgba(0,0,0,0.5)',
             padding: 14,
           }}
         >
