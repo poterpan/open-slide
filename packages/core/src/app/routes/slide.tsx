@@ -474,16 +474,16 @@ export function Slide() {
                   </Button>
                   <span aria-hidden className="w-px bg-brand-foreground/25" />
                   <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button
-                        size="sm"
-                        variant="brand"
-                        aria-label={t.slide.presentMenuAria}
-                        title={t.slide.presentMenuAria}
-                        className="rounded-l-none px-1.5"
-                      >
-                        <ChevronDown className="size-3.5" />
-                      </Button>
+                    <DropdownMenuTrigger
+                      type="button"
+                      aria-label={t.slide.presentMenuAria}
+                      title={t.slide.presentMenuAria}
+                      className={cn(
+                        buttonVariants({ variant: 'brand', size: 'sm' }),
+                        'rounded-l-none px-1.5',
+                      )}
+                    >
+                      <ChevronDown className="size-3.5" />
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end" className="min-w-[200px]">
                       <DropdownMenuItem onSelect={() => setPlayMode('window')}>
