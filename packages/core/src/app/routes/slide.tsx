@@ -472,7 +472,6 @@ export function Slide() {
                       F
                     </kbd>
                   </Button>
-                  <span aria-hidden className="w-px bg-brand-foreground/25" />
                   <DropdownMenu>
                     <DropdownMenuTrigger
                       type="button"
@@ -480,7 +479,7 @@ export function Slide() {
                       title={t.slide.presentMenuAria}
                       className={cn(
                         buttonVariants({ variant: 'brand', size: 'sm' }),
-                        'rounded-l-none px-1.5',
+                        'rounded-l-none px-1.5 shadow-[inset_1px_0_0_oklch(0_0_0/0.12),inset_0_1px_0_oklch(1_0_0/0.18),0_1px_0_oklch(0_0_0/0.16)]',
                       )}
                     >
                       <ChevronDown className="size-3.5" />
