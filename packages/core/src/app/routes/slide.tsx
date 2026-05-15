@@ -494,7 +494,12 @@ export function Slide() {
                         <Maximize />
                         {t.slide.presentFullscreen}
                       </DropdownMenuItem>
-                      <DropdownMenuItem onSelect={() => slideId && openPresenterWindow(slideId)}>
+                      <DropdownMenuItem
+                        onSelect={() => {
+                          if (slideId) openPresenterWindow(slideId);
+                          setPlayMode('window');
+                        }}
+                      >
                         <MonitorSpeaker />
                         {t.slide.presentPresenter}
                       </DropdownMenuItem>
