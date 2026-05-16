@@ -206,16 +206,5 @@ export async function init(opts: InitOptions): Promise<void> {
     );
   }
   const devCommand = packageManager === 'npm' ? 'npm run dev' : `${packageManager} dev`;
-  process.stdout.write(`  ${chalk.cyan(devCommand)}\n\n`);
-  process.stdout.write(
-    chalk.dim('Then open the dev server and start authoring in slides/<your-slide>/.\n'),
-  );
-  const syncCommand =
-    packageManager === 'npm' ? 'npm run sync:skills' : `${packageManager} sync:skills`;
-  process.stdout.write(
-    chalk.dim(
-      `\nLater, run \`${syncCommand}\` after bumping @open-slide/core to pull skill updates.\n` +
-        '(or accept the prompt that appears when starting `dev`.)\n',
-    ),
-  );
+  process.stdout.write(`  ${chalk.cyan(devCommand)}\n`);
 }
