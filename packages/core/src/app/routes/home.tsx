@@ -1,4 +1,6 @@
 import {
+  ArrowUpDown,
+  Check,
   FolderInput,
   FolderPlus,
   MoreHorizontal,
@@ -31,8 +33,37 @@ import { FolderIconChip, SLIDE_DND_MIME } from '../components/sidebar/folder-ite
 import { DRAFT_ID } from '../components/sidebar/sidebar';
 import { SlideCanvas } from '../components/slide-canvas';
 import type { Folder, FolderIcon, SlideModule } from '../lib/sdk';
-import { loadSlide } from '../lib/slides';
+import { loadSlide, slideCreatedAt } from '../lib/slides';
 import type { HomeOutletContext } from './home-shell';
+
+type SortKey = 'created-desc' | 'created-asc' | 'title-asc' | 'title-desc';
+
+const SORT_KEYS: readonly SortKey[] = ['created-desc', 'created-asc', 'title-asc', 'title-desc'];
+
+const DEFAULT_SORT: SortKey = 'created-desc';
+const SORT_STORAGE_KEY = 'open-slide:home-sort';
+
+function readSortPref(): SortKey {
+  if (typeof window === 'undefined') return DEFAULT_SORT;
+  try {
+    const raw = window.localStorage.getItem(SORT_STORAGE_KEY);
+    if (raw && (SORT_KEYS as readonly string[]).includes(raw)) return raw as SortKey;
+  } catch {}
+  return DEFAULT_SORT;
+}
+
+function useSortPref(): [SortKey, (next: SortKey) => void] {
+  const [sortKey, setSortKey] = useState<SortKey>(readSortPref);
+  const update = (next: SortKey) => {
+    setSortKey(next);
+    try {
+      window.localStorage.setItem(SORT_STORAGE_KEY, next);
+    } catch {}
+  };
+  return [sortKey, update];
+}
+
+const TITLE_COLLATOR = new Intl.Collator(undefined, { sensitivity: 'base', numeric: true });
 
 export function Home() {
   const {
@@ -58,6 +89,7 @@ export function Home() {
   const isDraft = selectedId === DRAFT_ID;
 
   const [query, setQuery] = useState('');
+  const [sortKey, setSortKey] = useSortPref();
 
   const trimmedQuery = query.trim().toLowerCase();
   const filteredSlides = useMemo(() => {
@@ -68,6 +100,24 @@ export function Home() {
       return tl ? tl.includes(trimmedQuery) : false;
     });
   }, [visibleSlides, titleMap, trimmedQuery]);
+  const sortedSlides = useMemo(() => {
+    const list = filteredSlides.slice();
+    const titleOf = (id: string) => titleMap[id] ?? id;
+    switch (sortKey) {
+      case 'title-asc':
+        list.sort((a, b) => TITLE_COLLATOR.compare(titleOf(a), titleOf(b)));
+        break;
+      case 'title-desc':
+        list.sort((a, b) => TITLE_COLLATOR.compare(titleOf(b), titleOf(a)));
+        break;
+      case 'created-asc':
+        list.sort((a, b) => (slideCreatedAt[a] ?? 0) - (slideCreatedAt[b] ?? 0));
+        break;
+      default:
+        list.sort((a, b) => (slideCreatedAt[b] ?? 0) - (slideCreatedAt[a] ?? 0));
+    }
+    return list;
+  }, [filteredSlides, sortKey, titleMap]);
   const isSearching = trimmedQuery.length > 0;
 
   return (
@@ -90,7 +140,8 @@ export function Home() {
               )}
             </span>
           )}
-          <div className="ml-auto w-full md:w-auto">
+          <div className="ml-auto flex w-full items-center gap-2 md:w-auto">
+            <SortControl value={sortKey} onChange={setSortKey} />
             <SearchInput value={query} onChange={setQuery} />
           </div>
         </div>
@@ -104,7 +155,7 @@ export function Home() {
         <NoResultsState query={query} onClear={() => setQuery('')} />
       ) : (
         <ul className="grid grid-cols-[repeat(auto-fill,minmax(240px,1fr))] gap-x-6 gap-y-9 md:grid-cols-[repeat(auto-fill,minmax(300px,1fr))]">
-          {filteredSlides.map((id) => (
+          {sortedSlides.map((id) => (
             <li key={id}>
               <SlideCard
                 id={id}
@@ -149,6 +200,41 @@ function SearchInput({ value, onChange }: { value: string; onChange: (value: str
         </button>
       )}
     </div>
+  );
+}
+
+function SortControl({ value, onChange }: { value: SortKey; onChange: (next: SortKey) => void }) {
+  const t = useLocale();
+  const labels: Record<SortKey, string> = {
+    'created-desc': t.home.sortByCreatedDesc,
+    'created-asc': t.home.sortByCreatedAsc,
+    'title-asc': t.home.sortByTitleAsc,
+    'title-desc': t.home.sortByTitleDesc,
+  };
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <button
+          type="button"
+          aria-label={`${t.home.sortLabel}: ${labels[value]}`}
+          title={`${t.home.sortLabel}: ${labels[value]}`}
+          className="flex h-8 w-8 items-center justify-center rounded-[6px] border border-border bg-background text-muted-foreground outline-none hover:text-foreground focus-visible:border-foreground/40 focus-visible:ring-2 focus-visible:ring-ring/30"
+        >
+          <ArrowUpDown className="size-3.5" />
+        </button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="end" className="min-w-[200px]">
+        {SORT_KEYS.map((key) => (
+          <DropdownMenuItem key={key} onSelect={() => onChange(key)}>
+            <Check
+              className={cn('size-3.5', value === key ? 'opacity-100' : 'opacity-0')}
+              aria-hidden
+            />
+            <span>{labels[key]}</span>
+          </DropdownMenuItem>
+        ))}
+      </DropdownMenuContent>
+    </DropdownMenu>
   );
 }
 
