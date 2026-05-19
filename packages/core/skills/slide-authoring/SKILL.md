@@ -374,5 +374,4 @@ This applies whenever the *visual element* repeats, not whenever the *data* does
 - ❌ Editing `package.json`, `open-slide.config.ts`, or other slides.
 - ❌ Sprinkling `<ImagePlaceholder>` across pages "for visual interest". Placeholders are for content the user owns; they're not stock-photo slots.
 - ❌ Using a placeholder for an icon or decorative shape — those are typography/SVG problems, not asset problems.
-- ❌ Full-page `radial-gradient` / `linear-gradient` backgrounds, large `box-shadow` blurs, or many small `inset` / ring shadows. PDF export strips these so macOS Preview stays responsive, so the exported file will look different from the screen. Prefer solid fills, `1px solid` borders, and `backgroundColor` over `backgroundImage` when PDF fidelity matters.
 - ❌ Rendering visually repeated elements with `array.map(...)` over a data array. Define a component and instantiate it explicitly per item (`<Card />`, `<Card />`, `<Card />`) so the inspector can edit each independently — a shared `map` body mutates every instance at once.
