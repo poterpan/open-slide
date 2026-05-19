@@ -1,6 +1,10 @@
+import { Crop, ImageIcon } from 'lucide-react';
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { PANEL_TRANSITION_MS } from '@/components/panel/panel-shell';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { findSlideSource, type SlideSourceHit } from '@/lib/inspector/fiber';
+import { useLocale } from '@/lib/use-locale';
+import { cn } from '@/lib/utils';
 import { useInspector } from './inspector-provider';
 
 type Highlight = { hit: SlideSourceHit };
@@ -82,6 +86,7 @@ export function InspectOverlay() {
       // Pin to the selection so the highlight tracks what the panel
       // is editing even after the cursor moves away.
       targetAnchor={selected?.anchor ?? hover?.hit.anchor ?? null}
+      selectedAnchor={selected?.anchor ?? null}
     />
   );
 }
@@ -90,10 +95,12 @@ function FrameOverlay({
   active,
   overlayRef,
   targetAnchor,
+  selectedAnchor,
 }: {
   active: boolean;
   overlayRef: React.RefObject<HTMLDivElement>;
   targetAnchor: HTMLElement | null;
+  selectedAnchor: HTMLElement | null;
 }) {
   const [rect, setRect] = useState<RelRect | null>(null);
   const [hasTarget, setHasTarget] = useState(false);
@@ -180,6 +187,12 @@ function FrameOverlay({
       `opacity ${FRAME_FADE_MS}ms ease-out`
     : `opacity ${FRAME_FADE_MS}ms ease-out`;
 
+  const showImageActions =
+    visible &&
+    !!rect &&
+    selectedAnchor instanceof HTMLImageElement &&
+    selectedAnchor === targetAnchor;
+
   return (
     <div ref={overlayRef} data-inspector-ui className="pointer-events-none absolute inset-0 z-30">
       {rect && (
@@ -197,7 +210,82 @@ function FrameOverlay({
           }}
         />
       )}
+      {rect && selectedAnchor && (
+        <ImageActionPanel
+          anchor={selectedAnchor}
+          rect={rect}
+          visible={showImageActions}
+          transition={transition}
+        />
+      )}
     </div>
+  );
+}
+
+const FLOATING_PANEL_GAP = 8;
+
+function ImageActionPanel({
+  anchor,
+  rect,
+  visible,
+  transition,
+}: {
+  anchor: HTMLElement;
+  rect: RelRect;
+  visible: boolean;
+  transition: string;
+}) {
+  const { openCrop, openReplace } = useInspector();
+  const t = useLocale();
+  return (
+    <TooltipProvider delayDuration={200}>
+      <div
+        className={cn(
+          'absolute flex items-center gap-0.5 rounded-[8px] border border-border bg-popover p-1 text-popover-foreground shadow-floating',
+          visible ? 'pointer-events-auto' : 'pointer-events-none',
+        )}
+        style={{
+          left: rect.left + rect.width / 2,
+          top: rect.top + rect.height + FLOATING_PANEL_GAP,
+          transform: 'translateX(-50%)',
+          opacity: visible ? 1 : 0,
+          transition,
+        }}
+      >
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <button
+              type="button"
+              aria-label={t.inspector.replace}
+              onClick={(e) => {
+                e.stopPropagation();
+                openReplace(anchor);
+              }}
+              className="inline-flex size-7 items-center justify-center rounded-[5px] text-foreground/85 transition-colors hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/40"
+            >
+              <ImageIcon className="size-3.5" />
+            </button>
+          </TooltipTrigger>
+          <TooltipContent side="bottom">{t.inspector.replace}</TooltipContent>
+        </Tooltip>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <button
+              type="button"
+              aria-label={t.inspector.crop}
+              onClick={(e) => {
+                e.stopPropagation();
+                openCrop(anchor as HTMLImageElement);
+              }}
+              className="inline-flex size-7 items-center justify-center rounded-[5px] text-foreground/85 transition-colors hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/40"
+            >
+              <Crop className="size-3.5" />
+            </button>
+          </TooltipTrigger>
+          <TooltipContent side="bottom">{t.inspector.crop}</TooltipContent>
+        </Tooltip>
+      </div>
+    </TooltipProvider>
   );
 }
 
