@@ -106,6 +106,37 @@ export function findAssetUsages(source: string, assetPath: string): number {
   return collectImgSrcUses(ast, target.defaultIdent).length;
 }
 
+export function findAssetUsagesBulk(
+  source: string,
+  assetPaths: readonly string[],
+): Map<string, number> {
+  const counts = new Map<string, number>();
+  for (const p of assetPaths) counts.set(p, 0);
+  if (assetPaths.length === 0) return counts;
+  const ast = parseSource(source);
+  if (!ast) return counts;
+  const wanted = new Set(assetPaths);
+  const identToPath = new Map<string, string>();
+  for (const imp of findImports(ast)) {
+    if (!imp.defaultIdent) continue;
+    if (wanted.has(imp.source)) identToPath.set(imp.defaultIdent, imp.source);
+  }
+  if (identToPath.size === 0) return counts;
+  walkJsx(ast, (n) => {
+    if (!t.isJSXElement(n)) return;
+    const opening = n.openingElement;
+    if (!t.isJSXIdentifier(opening.name) || opening.name.name !== 'img') return;
+    const src = findJsxAttr(opening, 'src');
+    if (!src?.value || !t.isJSXExpressionContainer(src.value)) return;
+    const expr = src.value.expression;
+    if (!t.isIdentifier(expr)) return;
+    const p = identToPath.get(expr.name);
+    if (!p) return;
+    counts.set(p, (counts.get(p) ?? 0) + 1);
+  });
+  return counts;
+}
+
 export function applyRevertAsset(source: string, assetPath: string): ApplyEditResult {
   const ast = parseSource(source);
   if (!ast) return { ok: false, status: 422, error: 'could not parse source' };

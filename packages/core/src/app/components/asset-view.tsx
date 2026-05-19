@@ -414,7 +414,11 @@ function AssetCard({
           <div className="truncate text-[12.5px] font-medium" title={asset.name}>
             {asset.name}
           </div>
-          <div className="folio truncate">{formatSize(asset.size)}</div>
+          <div className="folio flex items-center gap-1.5 truncate">
+            <span>{formatSize(asset.size)}</span>
+            <span className="opacity-50">·</span>
+            <UsageBadge usageCount={asset.usageCount} usageSlides={asset.usageSlides} />
+          </div>
         </div>
         <DropdownMenu>
           <DropdownMenuTrigger
@@ -444,6 +448,27 @@ function AssetCard({
         </DropdownMenu>
       </div>
     </div>
+  );
+}
+
+function UsageBadge({ usageCount, usageSlides }: { usageCount: number; usageSlides: number }) {
+  const t = useLocale();
+  if (usageCount <= 0) {
+    return <span className="text-muted-foreground">{t.asset.usageUnused}</span>;
+  }
+  const label = format(usageCount === 1 ? t.asset.usageCount.one : t.asset.usageCount.other, {
+    count: usageCount,
+  });
+  const title =
+    usageSlides > 1
+      ? format(usageSlides === 1 ? t.asset.usageSlides.one : t.asset.usageSlides.other, {
+          slides: usageSlides,
+        })
+      : undefined;
+  return (
+    <span className="text-brand" title={title}>
+      {label}
+    </span>
   );
 }
 
