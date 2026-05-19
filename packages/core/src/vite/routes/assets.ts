@@ -1,7 +1,7 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import type { ViteDevServer } from 'vite';
-import { findAssetUsages, findAssetUsagesBulk } from '../../editing/revert-asset.ts';
+import { findAssetUsages, findReferencedAssets } from '../../editing/revert-asset.ts';
 import { resolveSlideEntry, SLIDE_ID_RE } from '../../editing/slide-ops.ts';
 import {
   ASSET_MAX_BYTES,
@@ -138,12 +138,9 @@ export function registerAssetRoutes(server: ViteDevServer, ctx: ApiContext): voi
             } catch {
               continue;
             }
-            const counts = findAssetUsagesBulk(source, paths);
-            for (const [p, count] of counts) {
-              if (count <= 0) continue;
+            for (const p of findReferencedAssets(source, paths)) {
               const a = pathToAsset.get(p);
-              if (!a) continue;
-              a.unused = false;
+              if (a) a.unused = false;
             }
           }
         }
