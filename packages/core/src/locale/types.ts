@@ -272,10 +272,6 @@ export type Locale = {
     /** templates: "{count} file" / "{count} files" */
     fileCount: Plural;
     usageUnused: string;
-    /** templates: "Used {count} time" / "Used {count} times" */
-    usageCount: Plural;
-    /** templates: "Across {slides} slide" / "Across {slides} slides" */
-    usageSlides: Plural;
     searchLogos: string;
     upload: string;
     dropToUpload: string;

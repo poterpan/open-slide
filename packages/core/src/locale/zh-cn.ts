@@ -270,8 +270,6 @@ export const zhCN: Locale = {
     scopeGlobal: '全局',
     fileCount: { one: '{count} 个文件', other: '{count} 个文件' },
     usageUnused: '未使用',
-    usageCount: { one: '使用 {count} 次', other: '使用 {count} 次' },
-    usageSlides: { one: '跨 {slides} 张幻灯片', other: '跨 {slides} 张幻灯片' },
     searchLogos: '搜索 Logo',
     upload: '上传',
     dropToUpload: '拖入即可上传',

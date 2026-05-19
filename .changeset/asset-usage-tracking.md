@@ -2,4 +2,4 @@
 '@open-slide/core': minor
 ---
 
-Show usage counts on each asset card in the assets manager so unused files are easy to spot.
+Flag unused files in the assets manager with an "Unused" pill so they're easy to spot.

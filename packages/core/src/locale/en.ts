@@ -271,8 +271,6 @@ export const en: Locale = {
     scopeGlobal: 'Global',
     fileCount: { one: '{count} file', other: '{count} files' },
     usageUnused: 'Unused',
-    usageCount: { one: 'Used {count} time', other: 'Used {count} times' },
-    usageSlides: { one: 'Across {slides} slide', other: 'Across {slides} slides' },
     searchLogos: 'Search logos',
     upload: 'Upload',
     dropToUpload: 'Drop to upload',

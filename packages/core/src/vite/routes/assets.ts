@@ -95,8 +95,7 @@ export function registerAssetRoutes(server: ViteDevServer, ctx: ApiContext): voi
           mtime: number;
           mime: string;
           url: string;
-          usageCount: number;
-          usageSlides: number;
+          unused: boolean;
         }> = [];
         for (const name of entries) {
           if (!validateAssetName(name)) continue;
@@ -108,8 +107,7 @@ export function registerAssetRoutes(server: ViteDevServer, ctx: ApiContext): voi
             mtime: stat.mtimeMs,
             mime: mimeForFilename(name),
             url: `/__assets/${slideId}/${encodeURIComponent(name)}`,
-            usageCount: 0,
-            usageSlides: 0,
+            unused: true,
           });
         }
         assets.sort((a, b) => a.name.localeCompare(b.name));
@@ -145,8 +143,7 @@ export function registerAssetRoutes(server: ViteDevServer, ctx: ApiContext): voi
               if (count <= 0) continue;
               const a = pathToAsset.get(p);
               if (!a) continue;
-              a.usageCount += count;
-              a.usageSlides += 1;
+              a.unused = false;
             }
           }
         }

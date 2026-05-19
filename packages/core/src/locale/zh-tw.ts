@@ -270,8 +270,6 @@ export const zhTW: Locale = {
     scopeGlobal: '全域',
     fileCount: { one: '{count} 個檔案', other: '{count} 個檔案' },
     usageUnused: '未使用',
-    usageCount: { one: '使用 {count} 次', other: '使用 {count} 次' },
-    usageSlides: { one: '橫跨 {slides} 張投影片', other: '橫跨 {slides} 張投影片' },
     searchLogos: '搜尋 Logo',
     upload: '上傳',
     dropToUpload: '拖入即可上傳',

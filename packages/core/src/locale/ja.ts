@@ -273,8 +273,6 @@ export const ja: Locale = {
     scopeGlobal: 'グローバル',
     fileCount: { one: 'ファイル {count} 件', other: 'ファイル {count} 件' },
     usageUnused: '未使用',
-    usageCount: { one: '{count} 回使用', other: '{count} 回使用' },
-    usageSlides: { one: '{slides} 枚のスライドで使用', other: '{slides} 枚のスライドで使用' },
     searchLogos: 'ロゴを検索',
     upload: 'アップロード',
     dropToUpload: 'ドロップでアップロード',
