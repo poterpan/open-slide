@@ -48,12 +48,13 @@ import { NotesDrawer } from '../components/notes-drawer';
 import { PdfProgressToast } from '../components/pdf-progress-toast';
 import { openPresenterWindow, Player } from '../components/player';
 import { SlideCanvas } from '../components/slide-canvas';
+import { SlideTransitionLayer } from '../components/slide-transition-layer';
 import { type ThumbnailActions, ThumbnailRail } from '../components/thumbnail-rail';
 import { exportSlideAsHtml } from '../lib/export-html';
 import { exportSlideAsPdf, isSafari } from '../lib/export-pdf';
 import { remapNotesSessionCacheAfterReorder } from '../lib/inspector/use-notes';
-import { SlidePageProvider } from '../lib/page-context';
 import type { SlideModule } from '../lib/sdk';
+import { usePrefersReducedMotion } from '../lib/use-prefers-reduced-motion';
 import { useSlideModule } from '../lib/use-slide-module';
 
 const { showSlideUi, showSlideBrowser, allowHtmlDownload } = config.build;
@@ -76,6 +77,7 @@ export function Slide() {
   const { renameSlide } = useFolders();
   const slideViewportRef = useRef<HTMLElement>(null);
   const t = useLocale();
+  const prefersReducedMotion = usePrefersReducedMotion();
 
   const modulePages = useMemo(() => slide?.default ?? [], [slide]);
   const [pages, setPages] = useState<typeof modulePages>(modulePages);
@@ -325,6 +327,7 @@ export function Slide() {
       <Player
         pages={pages}
         design={slide.design}
+        transition={slide.transition}
         index={index}
         onIndexChange={goTo}
         onExit={() => setPlayMode(null)}
@@ -335,7 +338,6 @@ export function Slide() {
     );
   }
 
-  const CurrentPage = pages[index];
   const title = slide.meta?.title ?? slideId;
 
   return (
@@ -585,9 +587,13 @@ export function Slide() {
                       canNext={index < pageCount - 1}
                     />
                     <SlideCanvas design={slide.design}>
-                      <SlidePageProvider index={index} total={pageCount}>
-                        <CurrentPage />
-                      </SlidePageProvider>
+                      <SlideTransitionLayer
+                        pages={pages}
+                        index={index}
+                        total={pageCount}
+                        moduleTransition={slide.transition}
+                        disabled={prefersReducedMotion}
+                      />
                     </SlideCanvas>
                     <ClickNavZones
                       onPrev={() => goTo(index - 1)}
