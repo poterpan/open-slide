@@ -5,6 +5,7 @@ import {
   AlignRight,
   Bold,
   Crop,
+  Crosshair,
   ImageIcon,
   Italic,
   X,
@@ -236,6 +237,7 @@ export function InspectorPanel() {
       header={
         <>
           <div className="flex min-w-0 items-center gap-2">
+            <Crosshair className="size-3.5 text-muted-foreground" />
             <span className="font-heading text-[12px] font-semibold tracking-tight">
               {t.inspector.inspect}
             </span>
@@ -261,16 +263,17 @@ export function InspectorPanel() {
       footer={<CommentsSection selected={pinSelected} onAdd={add} />}
     >
       {pinSnapshot.text !== null && (
-        <Section title={t.inspector.contentSection}>
-          <ContentField
-            snapshot={pinSnapshot}
-            apply={apply}
-            onSelectionChange={setContentSelection}
-          />
-        </Section>
+        <>
+          <Section title={t.inspector.contentSection}>
+            <ContentField
+              snapshot={pinSnapshot}
+              apply={apply}
+              onSelectionChange={setContentSelection}
+            />
+          </Section>
+          <Separator />
+        </>
       )}
-
-      <Separator />
 
       <Section title={t.inspector.typographySection}>
         <FontSizeField snapshot={typographySnapshot} apply={applyTextStyle} />

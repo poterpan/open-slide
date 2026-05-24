@@ -37,17 +37,29 @@ export interface InitOptions {
   locale: LocaleCode;
 }
 
+export function sanitizeDirName(value: string): string {
+  const trimmed = value.trim();
+  if (trimmed === '.' || trimmed === '..') return trimmed;
+  const cleaned = trimmed
+    .replace(/\s+/g, '-')
+    .replace(/[^\\\p{L}\p{N}_./-]/gu, '-')
+    .replace(/-+/g, '-')
+    .replace(/(^-|-$)/g, '')
+    .replace(/-*([/\\])-*/g, '$1');
+  if (cleaned === '' || /^[/\\]+$/.test(cleaned)) return 'my-slides';
+  return cleaned;
+}
+
 export async function isDirNonEmpty(target: string): Promise<boolean> {
   if (!existsSync(target)) return false;
   const entries = await readdir(target);
   return entries.some((e) => !e.startsWith('.'));
 }
 
-async function readCliVersion(): Promise<string> {
-  const pkg = JSON.parse(await readFile(resolve(HERE, '..', 'package.json'), 'utf8')) as {
-    version: string;
-  };
-  return pkg.version;
+declare const __CORE_VERSION_AT_BUILD__: string;
+
+function coreVersionRange(): string {
+  return `^${__CORE_VERSION_AT_BUILD__}`;
 }
 
 async function linkOrCopy(relSrc: string, dst: string): Promise<void> {
@@ -144,7 +156,7 @@ export async function init(opts: InitOptions): Promise<void> {
     pkg.version = '0.0.0';
     pkg.private = true;
     if (pkg.dependencies?.['@open-slide/core']) {
-      pkg.dependencies['@open-slide/core'] = `^${await readCliVersion()}`;
+      pkg.dependencies['@open-slide/core'] = coreVersionRange();
     }
     await writeFile(pkgPath, `${JSON.stringify(pkg, null, 2)}\n`);
   }
@@ -154,7 +166,7 @@ export async function init(opts: InitOptions): Promise<void> {
     await writeFile(configPath, renderConfigFile(locale));
   }
 
-  await writeFile(join(target, '.gitignore'), 'node_modules\ndist\n');
+  await writeFile(join(target, '.gitignore'), 'node_modules\ndist\n.DS_Store\n');
 
   const cdTarget = dir === '.' ? basename(target) : dir;
   process.stdout.write(
