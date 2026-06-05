@@ -28,8 +28,10 @@ import {
   useInspector,
 } from '@/components/inspector/inspector-provider';
 import { SaveBar } from '@/components/inspector/save-bar';
+import { LanguageToggle } from '@/components/language-toggle';
 import { DesignProvider } from '@/components/style-panel/design-provider';
 import { DesignPanel, DesignToggleButton } from '@/components/style-panel/style-panel';
+import { ThemeToggle } from '@/components/theme-toggle';
 import { Button, buttonVariants } from '@/components/ui/button';
 import {
   DropdownMenu,
@@ -576,6 +578,12 @@ export function Slide() {
                 <DesignToggleButton active={designOpen} onToggle={() => setDesignOpen((v) => !v)} />
               )}
               {view === 'slides' && <InspectToggleButton />}
+              {config.mode === 'standalone' && (
+                <>
+                  <LanguageToggle />
+                  <ThemeToggle />
+                </>
+              )}
               <span aria-hidden className="mx-0.5 hidden h-5 w-px bg-hairline md:block" />
               {view === 'slides' && (
                 <div className="inline-flex items-stretch">
