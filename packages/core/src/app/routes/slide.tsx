@@ -398,6 +398,12 @@ export function Slide() {
             </div>
 
             <div className="ml-auto flex shrink-0 items-center gap-1">
+              {config.mode === 'standalone' && (
+                <>
+                  <LanguageToggle />
+                  <ThemeToggle />
+                </>
+              )}
               {view === 'slides' && (
                 <button
                   type="button"
@@ -578,12 +584,6 @@ export function Slide() {
                 <DesignToggleButton active={designOpen} onToggle={() => setDesignOpen((v) => !v)} />
               )}
               {view === 'slides' && <InspectToggleButton />}
-              {config.mode === 'standalone' && (
-                <>
-                  <LanguageToggle />
-                  <ThemeToggle />
-                </>
-              )}
               <span aria-hidden className="mx-0.5 hidden h-5 w-px bg-hairline md:block" />
               {view === 'slides' && (
                 <div className="inline-flex items-stretch">
